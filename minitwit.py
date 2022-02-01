@@ -15,9 +15,8 @@ from hashlib import md5
 from datetime import datetime
 from contextlib import closing
 from flask import Flask, request, session, url_for, redirect, \
-     render_template, abort, g, flash
+    render_template, abort, g, flash
 from werkzeug.security import check_password_hash, generate_password_hash
-
 
 # configuration
 DATABASE = 'minitwit.db'
@@ -53,7 +52,7 @@ def query_db(query, args=(), one=False):
 def get_user_id(username):
     """Convenience method to look up the id for a username."""
     rv = g.db.execute('select user_id from user where username = ?',
-                       [username]).fetchone()
+                      [username]).fetchone()
     return rv[0] if rv else None
 
 
@@ -65,7 +64,7 @@ def format_datetime(timestamp):
 def gravatar_url(email, size=80):
     """Return the gravatar image for the given email address."""
     return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
-        (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
+           (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
 
 
 @app.before_request
@@ -104,7 +103,8 @@ def timeline():
             user.user_id in (select whom_id from follower
                                     where who_id = ?))
         order by message.pub_date desc limit ?''',
-        [session['user_id'], session['user_id'], PER_PAGE]))
+                                                              [session['user_id'],
+                                                               session['user_id'], PER_PAGE]))
 
 
 @app.route('/public')
@@ -127,13 +127,14 @@ def user_timeline(username):
     if g.user:
         followed = query_db('''select 1 from follower where
             follower.who_id = ? and follower.whom_id = ?''',
-            [session['user_id'], profile_user['user_id']], one=True) is not None
+                            [session['user_id'], profile_user['user_id']], one=True) is not None
     return render_template('timeline.html', messages=query_db('''
             select message.*, user.* from message, user where
             user.user_id = message.author_id and user.user_id = ?
             order by message.pub_date desc limit ?''',
-            [profile_user['user_id'], PER_PAGE]), followed=followed,
-            profile_user=profile_user)
+                                                              [profile_user['user_id'], PER_PAGE]),
+                           followed=followed,
+                           profile_user=profile_user)
 
 
 @app.route('/<username>/follow')
@@ -145,7 +146,7 @@ def follow_user(username):
     if whom_id is None:
         abort(404)
     g.db.execute('insert into follower (who_id, whom_id) values (?, ?)',
-                [session['user_id'], whom_id])
+                 [session['user_id'], whom_id])
     g.db.commit()
     flash('You are now following "%s"' % username)
     return redirect(url_for('user_timeline', username=username))
@@ -160,7 +161,7 @@ def unfollow_user(username):
     if whom_id is None:
         abort(404)
     g.db.execute('delete from follower where who_id=? and whom_id=?',
-                [session['user_id'], whom_id])
+                 [session['user_id'], whom_id])
     g.db.commit()
     flash('You are no longer following "%s"' % username)
     return redirect(url_for('user_timeline', username=username))
@@ -174,7 +175,7 @@ def add_message():
     if request.form['text']:
         g.db.execute('''insert into message (author_id, text, pub_date, flagged)
             values (?, ?, ?, 0)''', (session['user_id'], request.form['text'],
-                                  int(time.time())))
+                                     int(time.time())))
         g.db.commit()
         flash('Your message was recorded')
     return redirect(url_for('timeline'))
@@ -211,7 +212,7 @@ def register():
         if not request.form['username']:
             error = 'You have to enter a username'
         elif not request.form['email'] or \
-                 '@' not in request.form['email']:
+                '@' not in request.form['email']:
             error = 'You have to enter a valid email address'
         elif not request.form['password']:
             error = 'You have to enter a password'
@@ -222,8 +223,8 @@ def register():
         else:
             g.db.execute('''insert into user (
                 username, email, pw_hash) values (?, ?, ?)''',
-                [request.form['username'], request.form['email'],
-                 generate_password_hash(request.form['password'])])
+                         [request.form['username'], request.form['email'],
+                          generate_password_hash(request.form['password'])])
             g.db.commit()
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
@@ -244,7 +245,6 @@ app.jinja_env.filters['datetimeformat'] = format_datetime
 app.jinja_env.filters['gravatar'] = gravatar_url
 app.secret_key = SECRET_KEY
 app.debug = DEBUG
-
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
