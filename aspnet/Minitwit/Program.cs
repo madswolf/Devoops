@@ -1,9 +1,29 @@
+using Microsoft.EntityFrameworkCore;
+using Minitwit.Models.Context;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<MinitwitContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Minitwit"));
+});
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
+    app.UseMigrationsEndPoint();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
