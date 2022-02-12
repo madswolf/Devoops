@@ -22,7 +22,7 @@ def post_follower(record):
     cur_user = record[0]
     followed_user = record[1]
     data = parse.urlencode({"who": cur_user, "whom": followed_user}).encode()
-    request.Request(API_ENDPOINT, data=data)
+    request.urlopen(API_ENDPOINT, data=data)
 
 
 def run():
