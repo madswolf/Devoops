@@ -21,7 +21,7 @@ def post_user(record):
     email = record[2]
     salt, hash = parse_hash(record[3])
     data = parse.urlencode({"username": user_name, "email": email, "salt": salt, "hash": hash}).encode()
-    request.Request(API_ENDPOINT, data=data)
+    request.urlopen(API_ENDPOINT, data=data)
 
 
 def run():
