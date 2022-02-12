@@ -12,11 +12,12 @@
         <base href="~/" />
         <link rel=stylesheet type=text/css href="css/style.css">
         <title>Welcome | MiniTwit</title>
+        <script src="_framework/blazor.server.js"></script> 
     </head>
     <body>
         <div class=page>
             <h1>MiniTwit</h1>
-
+            @(await Html.RenderComponentAsync<Minitwit.Views.Shared.Components.MainLayout>(RenderMode.ServerPrerendered))
         </div>
     </body>
 </html>
