@@ -10,6 +10,7 @@ namespace Minitwit.Models.Entity
         public int ID { get; set; }
         public string Username { get; set; }
         public string PassWordHash { get; set; }
+        public string Salt { get; set; }
         public string Email { get; set; }
         public List<User> Follows { get; set; }
         public List<User> FollowedBy { get; set; }
