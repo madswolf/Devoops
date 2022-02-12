@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
+using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 
 namespace Minitwit.Controllers
@@ -35,7 +36,7 @@ namespace Minitwit.Controllers
             }
 
             var message = await _context.Posts
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (message == null)
             {
                 return NotFound();
@@ -54,16 +55,30 @@ namespace Minitwit.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Text,PublishDate,Flagged")] Message message)
+        public async Task<IActionResult> Create(MessageDTO message)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(message);
+                User author = await _context.Users.FirstOrDefaultAsync(u => u.Username == message.AuthorName);
+                if (author == null)
+                {
+                    return NotFound();
+                }
+
+                Message newMessage = new Message()
+                {
+                    Author = author,
+                    Text = message.Text,
+                    Flagged = message.Flagged,
+                    PublishDate = DateTimeOffset.FromUnixTimeSeconds(message.Created).DateTime
+                };
+
+                _context.Posts.Add(newMessage);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(message);
+                return Ok();
+;            }
+
+            return new UnsupportedMediaTypeResult();
         }
 
         // GET: Messages/Edit/5
@@ -87,9 +102,9 @@ namespace Minitwit.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Text,PublishDate,Flagged")] Message message)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Text,PublishDate,Flagged")] Message message)
         {
-            if (id != message.ID)
+            if (id != message.Id)
             {
                 return NotFound();
             }
@@ -103,7 +118,7 @@ namespace Minitwit.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MessageExists(message.ID))
+                    if (!MessageExists(message.Id))
                     {
                         return NotFound();
                     }
@@ -126,7 +141,7 @@ namespace Minitwit.Controllers
             }
 
             var message = await _context.Posts
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (message == null)
             {
                 return NotFound();
@@ -148,7 +163,7 @@ namespace Minitwit.Controllers
 
         private bool MessageExists(int id)
         {
-            return _context.Posts.Any(e => e.ID == id);
+            return _context.Posts.Any(e => e.Id == id);
         }
     }
 }
