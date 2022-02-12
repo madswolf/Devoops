@@ -5,7 +5,7 @@
 aspnet/Minitwit/.vs/
 aspnet/Minitwit/obj/
 aspnet/Minitwit/bin/
-*.suo
+
 # User-specific files
 *.rsuser
 *.suo
