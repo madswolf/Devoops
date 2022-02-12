@@ -1,0 +1,50 @@
+﻿@page "/Layout"
+@using Minitwit.Models.Entity
+@using System.Collections.Generic
+
+
+<div class=navigation>
+    <p>Razor page loaded</p>
+    @if (user is not null)
+    {
+        <a href="">my timeline</a>
+        <a href="">public timeline</a>
+        <a href="">sign out @user.Username</a>
+    }
+    else
+    {
+        <a href="">public timeline</a>
+        <a href="">sign up</a>
+        <a href="">sign in</a>
+    }
+</div>
+
+@if (flashes is not null)
+{
+    <ul class=flashes>
+        @foreach (var message in flashes)
+        {
+            <li> @message.Text </li>
+        }
+    </ul>
+}
+
+<div class=body>
+    
+</div>
+
+<div class=footer>
+    MiniTwit; A Asp.net Application
+</div>
+
+@code {
+    private List<Message> flashes;
+    private User user;
+
+
+
+    private List<Message> get_flashed_messages()
+    {
+        throw new NotImplementedException();
+    }
+}
