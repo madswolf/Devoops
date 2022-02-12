@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Scripting.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
+using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 
 namespace Minitwit.Controllers
@@ -35,7 +37,7 @@ namespace Minitwit.Controllers
             }
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
                 return NotFound();
@@ -54,17 +56,44 @@ namespace Minitwit.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create(User user)
+        public async Task<IActionResult> Create( UserDTO user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                Console.WriteLine();
             }
-            return View(user);
+
+            User newUser = new User
+            {
+                Username = user.Username,
+                PasswordHash = user.PasswordHash,
+                Salt = user.Salt,
+                Email = user.Email
+            };
+            _context.Add(newUser);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Follow(FollowDTO followDto)
+        {
+            User whom = _context.Users
+                .Include(u => u.FollowedBy)
+                .FirstOrDefault(u => u.Username  == followDto.Whom);
+
+            User who = _context.Users
+                .Include(u => u.Follows)
+                .FirstOrDefault(u => u.Username == followDto.Who);
+
+            if (whom != null && who != null)
+            {
+                whom.FollowedBy.Add(who);
+                who.Follows.Add(whom);
+            }
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -86,9 +115,9 @@ namespace Minitwit.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Username,PassWordHash,Email")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,PasswordHash,Email")] User user)
         {
-            if (id != user.ID)
+            if (id != user.Id)
             {
                 return NotFound();
             }
@@ -102,7 +131,7 @@ namespace Minitwit.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.ID))
+                    if (!UserExists(user.Id))
                     {
                         return NotFound();
                     }
@@ -125,7 +154,7 @@ namespace Minitwit.Controllers
             }
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
                 return NotFound();
@@ -147,7 +176,7 @@ namespace Minitwit.Controllers
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.ID == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }

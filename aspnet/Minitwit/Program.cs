@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<MinitwitContext>(options =>
 {
-    options.UseInMemoryDatabase("Test");
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit"));
 });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
