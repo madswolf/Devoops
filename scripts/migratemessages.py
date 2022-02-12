@@ -1,7 +1,8 @@
 import sqlite3
 from  urllib import request, parse
+import requests
 
-API_ENDPOINT = "https://localhost:5000/migrateMsg"
+API_ENDPOINT = "https://localhost:7077/Messages/Create"
 DATABASE = "../pyshite/minitwit.db"
 conn = sqlite3.connect(DATABASE)
 cur = conn.cursor()
@@ -21,8 +22,10 @@ def post_message(record):
     text = record[1]
     pubdate = record[2]
     flagged = record[3]
-    data = parse.urlencode({"author": author, "text": text, "pubdate": pubdate, "flagged": flagged}).encode()
-    request.urlopen(API_ENDPOINT, data=data)
+    print(record)
+    data = {"AuthorName": author, "Text": text, "Created": pubdate, "Flagged": bool(flagged)}
+    response = requests.post(API_ENDPOINT, data=data,  verify=False)
+    print(response)
 
 
 def run():
