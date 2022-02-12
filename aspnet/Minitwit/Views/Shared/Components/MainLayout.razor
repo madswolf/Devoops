@@ -1,9 +1,9 @@
-﻿@page "/Layout"
+﻿@page "/"
 @using Minitwit.Models.Entity
 @using System.Collections.Generic
+@using Microsoft.AspNetCore.Components
 
 <div class=navigation>
-    <p>Razor page loaded</p>
     @if (user is not null)
     {
         <a href="">my timeline</a>
