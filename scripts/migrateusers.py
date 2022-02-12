@@ -20,9 +20,7 @@ def post_user(record):
     user_name = record[1]
     email = record[2]
     salt, hash = parse_hash(record[3])
-    qs = "?username={}&email={}&salt={}&hash={}".format(user_name, email, salt, hash)
-    print(API_ENDPOINT + qs)
-    #request.Request(API_ENDPOINT + qs)
+    request.Request(API_ENDPOINT, data={"username": user_name, "email": email, "salt": salt, "hash": hash})
 
 
 def run():
