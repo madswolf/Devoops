@@ -3,9 +3,6 @@ services:
   aspnet:
     build:
       context: .
-      dockerfile: Dockerfile
-      args:
-        - IF_YOU_READ_DIS=u_stupid
     ports:
-      - "8000:8000"
-    command: sh -c "echo inside cont"
+      - "8000:80"
+    command: ls
