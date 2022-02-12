@@ -9,6 +9,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<MinitwitContext>(options =>
 {
     options.UseInMemoryDatabase("Test");
+    //options.UseNpgsql("host=db-postgresql-fra1-40527-do-user-10842035-0.b.db.ondigitalocean.com;database=defaultdb;user id=doadmin;password=hYj0D9znk3OpXyIi;port=25060");
 });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();

@@ -13,13 +13,17 @@ namespace Minitwit.Models.Context
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        { 
+            modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+
             modelBuilder.Entity<User>().HasMany(u => u.FollowedBy);
+
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Messages)
                 .WithOne(m => m.Author)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+           
             modelBuilder.Entity<User>().HasMany(u => u.Follows);
         }
     }
