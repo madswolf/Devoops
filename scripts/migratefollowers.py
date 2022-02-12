@@ -27,7 +27,7 @@ def post_follower(record):
 
 def run():
     followers = get_all_followers()
-    for u in followers:
-        post_follower(u)
+    for f in followers:
+        post_follower(f)
 
 run()
