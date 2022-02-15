@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@inherits LayoutComponentBase
 @using Minitwit.Models.Entity
 @using System.Collections.Generic
 @using Microsoft.AspNetCore.Components
@@ -6,13 +6,13 @@
 <div class=navigation>
     @if (user is not null)
     {
-        <a href="">my timeline</a>
+        <a href="timeline">my timeline</a>
         <a href="">public timeline</a>
         <a href="">sign out @user.Username</a>
     }
     else
     {
-        <a href="">public timeline</a>
+        <a href="timeline">public timeline</a>
         <a href="">sign up</a>
         <a href="">sign in</a>
     }
@@ -29,7 +29,7 @@
 }
 
 <div class=body>
-    
+    @Body
 </div>
 
 <div class=footer>

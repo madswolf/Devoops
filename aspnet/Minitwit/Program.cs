@@ -5,8 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorPages();
 builder.Services.AddDbContext<MinitwitContext>(options =>
 {
     options.UseInMemoryDatabase("Test");
@@ -50,5 +50,7 @@ app.MapControllerRoute(
 app.MapBlazorHub();
 
 app.MapRazorPages();
+
+app.MapFallbackToPage("/");
 
 app.Run();
