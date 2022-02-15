@@ -12,6 +12,9 @@ aspnet/Minitwit/bin/
 *.user
 *.userosscache
 *.sln.docstates
+.vs/
+obj/
+bin/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
