@@ -389,3 +389,13 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+aspnet/Minitwit/appsettings.json
+aspnet/Minitwit/.vs/Minitwit/v17/.suo
+aspnet/Minitwit/obj/Debug/net6.0/Minitwit.assets.cache
+aspnet/Minitwit/obj/Debug/net6.0/Minitwit.GeneratedMSBuildEditorConfig.editorconfig
+aspnet/Minitwit/obj/Minitwit.csproj.nuget.dgspec.json
+aspnet/Minitwit/obj/Minitwit.csproj.nuget.g.props
+aspnet/Minitwit/obj/project.assets.json
+aspnet/Minitwit/obj/project.nuget.cache
+*.cache
+*.props
