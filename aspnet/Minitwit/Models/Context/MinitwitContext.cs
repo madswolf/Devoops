@@ -11,6 +11,7 @@ namespace Minitwit.Models.Context
 
         public DbSet<Message> Posts { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Latest> Latest { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 
