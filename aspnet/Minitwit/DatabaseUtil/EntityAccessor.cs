@@ -1,4 +1,5 @@
-﻿using Minitwit.Models.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using Minitwit.Models.Context;
 using Minitwit.Models.Entity;
 
 namespace Minitwit.DatabaseUtil
@@ -17,9 +18,14 @@ namespace Minitwit.DatabaseUtil
             return _context.Posts.Where(m => m.Author.Id == id && !m.Flagged).ToList();
         }
 
-        public User GetUserById(int id)
+        public async Task<User?> GetUserByUsername(string username)
         {
-            return _context.Users.Where(u => u.Id == id).First();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        }
+
+        public async Task<User?> GetUserById(int id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public List<Message> GetMessages()
@@ -41,17 +47,5 @@ namespace Minitwit.DatabaseUtil
         {
             _context.Posts.Add(message);
         }
-
-        // Might not be a necessary method, since GetUserById already exists.
-        public void AFollowB(int idA, int idB)
-        {
-            var uA = GetUserById(idA);
-            var uB = GetUserById(idB);
-
-            uA.Follows.Add(uB);
-            uB.Follows.Add(uA);
-        }
-
-
     }
 }
