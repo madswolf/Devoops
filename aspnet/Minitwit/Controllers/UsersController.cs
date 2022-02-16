@@ -56,13 +56,17 @@ namespace Minitwit.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create( UserDTO user)
+        public async Task<IActionResult> Create(UserCreationDTO user)
         {
-            if (ModelState.IsValid)
-            {
-                Console.WriteLine();
-            }
-
+            /*
+             TODO Real user creation with proper authorization
+             TODO Aka. hashing and salting etc.   
+             */
+            return StatusCode(204);
+        }
+        
+        public async Task<IActionResult> MigrationCreate(UserDTO user)
+        {
             User newUser = new User
             {
                 Username = user.Username,
