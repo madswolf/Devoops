@@ -54,8 +54,7 @@ namespace Minitwit.Controllers
         // POST: Messages/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        public async Task<IActionResult> Create(MessageDTO message)
+        public async Task<IActionResult> MigrationCreate(MessageDTO message)
         {
             if (ModelState.IsValid)
             {
