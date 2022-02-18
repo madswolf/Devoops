@@ -6,6 +6,7 @@ using Minitwit.DatabaseUtil;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
+using Minitwit.Services;
 using static System.Int32;
 
 namespace Minitwit.Controllers
@@ -13,39 +14,19 @@ namespace Minitwit.Controllers
     public class SimulatorController : Controller
     {
         private readonly MinitwitContext _context;
-        private readonly UsersController _usersController;
-        private readonly EntityAccessor _entityAccessor;
+        private readonly IEntityAccessor _entityAccessor;
+        private readonly IUserService _userService;
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
-        public SimulatorController(MinitwitContext context, UsersController usersController, EntityAccessor entityAccessor)
+        public SimulatorController(MinitwitContext context, IEntityAccessor entityAccessor, IUserService userService)
         {
             _context = context;
-            _usersController = usersController;
             _entityAccessor = entityAccessor;
-        }
-
-        private bool IsRequestFromSimulator()
-        {
-            return Request.Headers["Authorization"].Equals($"Basic {simulatorAPIToken}");
-        }
-
-        private async void UpdateLatest()
-        {
-            var isLatestInQuery = Request.Query.TryGetValue("latest",out var latestString);
-            if (isLatestInQuery)
-            {
-                var latest = new Latest()
-                {
-                    Value = Parse(latestString),
-                    CreationTime = DateTime.UtcNow
-                };
-                _context.Latest.Add(latest);
-                await _context.SaveChangesAsync();
-            }
+            _userService = userService;
         }
 
         [HttpGet]
-        [Route("/latest")]
+        [Route("[Controller]/latest")]
         [AllowAnonymous]
         public async Task<IActionResult> Latest()
         {
@@ -55,21 +36,31 @@ namespace Minitwit.Controllers
                 latest =
                     _context.Latest
                         .OrderByDescending(l => l.CreationTime)
+                        .Select(l => l.Value)
                         .FirstOrDefault()
+                    
             });
         }
 
         [HttpPost]
-        [Route("/regitster")]
+        [Route("[Controller]/register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(UserCreationDTO userDTO)
+        public async Task<IActionResult> Register([FromBody] UserCreationDTO userDTO)
         {
             UpdateLatest();
-            return await _usersController.Create(userDTO);
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
+
+            return await _userService.CreateUser(userDTO) switch
+            {
+                Result.Conflict => StatusCode(400),
+                Result.Created => StatusCode(204),
+                //should never happen
+                _ => throw new Exception()
+            };
         }
 
         [HttpGet]
-        [Route("/msgs")]
+        [Route("[controller]/msgs")]
         [AllowAnonymous]
         public async Task<IActionResult> Messages([FromQuery(Name = "no")] int limit = 100)
         {
@@ -94,8 +85,8 @@ namespace Minitwit.Controllers
             return Unauthorized();
         }
 
+        [Route("[controller]/msgs/{username}")]
         [HttpGet]
-        [Route("/msgs/{Username}")]
         [AllowAnonymous]
         public async Task<IActionResult> MessagesFromUser(string username, [FromQuery(Name = "no")] int limit = 100)
         {
@@ -120,17 +111,18 @@ namespace Minitwit.Controllers
         }
 
         [HttpPost]
-        [Route("/msgs/{Username}")]
+        [Route("[controller]/msgs/{Username}")]
         [AllowAnonymous]
         public async Task<IActionResult> MessagesAsUser(string username, [FromBody] SimulatorMessageCreationDTO messageDTO)
         {
             UpdateLatest();
             if (!IsRequestFromSimulator()) return Unauthorized();
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
             var user = await _entityAccessor.GetUserByUsername(username);
             if (user == null)
             {
-                return NotFound(username);
+                return NotFound($"User with name {username} not found");
             }
 
             _context.Posts.Add(new Message()
@@ -145,7 +137,7 @@ namespace Minitwit.Controllers
         }
 
         [HttpGet]
-        [Route("/fllws/{Username}")]
+        [Route("[controller]/fllws/{Username}")]
         [AllowAnonymous]
         public async Task<IActionResult> FollowsFromUser(string username, [FromQuery(Name = "no")] int limit = 100)
         {
@@ -155,10 +147,11 @@ namespace Minitwit.Controllers
             var filteredMessages = await _context.Users
                 .Include(u => u.Follows)
                 .Where(u => u.Username == username)
-                .Take(limit)
                 .Select(u => new
                 {
-                    follows = u.Follows.Select(u2 => u2.Username)
+                    follows = u.Follows
+                        .Select(u2 => u2.Username)
+                        .Take(limit)
                 })
                 .ToListAsync();
 
@@ -166,7 +159,7 @@ namespace Minitwit.Controllers
         }
 
         [HttpPost]
-        [Route("/msgs/{Username}")]
+        [Route("[controller]/fllws/{Username}")]
         [AllowAnonymous]
         public async Task<IActionResult> FollowAsUser(string username, [FromBody] SimulatorFollowOrUnfollowDTO followDTO)
         {
@@ -195,6 +188,25 @@ namespace Minitwit.Controllers
 
             await _context.SaveChangesAsync();
             return StatusCode(204);
+        }
+        private bool IsRequestFromSimulator()
+        {
+            return Request.Headers["Authorization"].Equals($"Basic {simulatorAPIToken}");
+        }
+
+        private async void UpdateLatest()
+        {
+            var isLatestInQuery = Request.Query.TryGetValue("latest", out var latestString);
+            if (isLatestInQuery)
+            {
+                var latest = new Latest()
+                {
+                    Value = Parse(latestString),
+                    CreationTime = DateTime.UtcNow
+                };
+                _context.Latest.Add(latest);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
