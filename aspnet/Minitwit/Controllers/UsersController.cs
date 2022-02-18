@@ -10,16 +10,19 @@ using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
+using Minitwit.Services;
 
 namespace Minitwit.Controllers
 {
     public class UsersController : Controller
     {
         private readonly MinitwitContext _context;
+        private readonly IUserService _userService;
 
-        public UsersController(MinitwitContext context)
+        public UsersController(MinitwitContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         // GET: Users
@@ -56,13 +59,17 @@ namespace Minitwit.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create(UserCreationDTO user)
+        public async Task<IActionResult> Create([FromBody]UserCreationDTO userDTO)
         {
-            /*
-             TODO Real user creation with proper authorization
-             TODO Aka. hashing and salting etc.   
-             */
-            return StatusCode(204);
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
+
+            return await _userService.CreateUser(userDTO) switch
+            {
+                Result.Conflict => StatusCode(413),
+                Result.Created => StatusCode(201),
+                //should never happen
+                _ => throw new Exception()
+            };
         }
         
         public async Task<IActionResult> MigrationCreate(UserDTO user)

@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
+using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 
 namespace Minitwit.DatabaseUtil
 {
-    public class EntityAccessor
+    public class EntityAccessor : IEntityAccessor
     {
         private readonly MinitwitContext _context;
 
