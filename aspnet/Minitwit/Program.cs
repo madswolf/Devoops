@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Minitwit.DatabaseUtil;
 using Minitwit.Models.Context;
+using Minitwit.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,9 @@ builder.Services.AddDbContext<MinitwitContext>(options =>
 });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEntityAccessor, EntityAccessor>();
 
 var app = builder.Build();
 
