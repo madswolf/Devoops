@@ -45,7 +45,7 @@ namespace Minitwit.Controllers
         [HttpPost]
         [Route("[Controller]/register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] UserCreationDTO userDTO)
+        public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userDTO)
         {
             UpdateLatest();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
@@ -76,7 +76,7 @@ namespace Minitwit.Controllers
                     {
                         content = p.Text,
                         pub_date = p.PublishDate,
-                        user = p.Author.Username
+                        user = p.Author.UserName
                     });
 
                 return Ok(filteredMessages);
@@ -95,14 +95,14 @@ namespace Minitwit.Controllers
 
             var filteredMessages = await _context.Posts
                 .Include(p => p.Author)
-                .Where(p => !p.Flagged && p.Author.Username == username)
+                .Where(p => !p.Flagged && p.Author.UserName == username)
                 .OrderByDescending(p => p.PublishDate)
                 .Take(limit)
                 .Select(p => new
                 {
                     content = p.Text,
                     pub_date = p.PublishDate,
-                    user = p.Author.Username
+                    user = p.Author.UserName
                 })
                 .ToListAsync();
 
@@ -111,7 +111,7 @@ namespace Minitwit.Controllers
         }
 
         [HttpPost]
-        [Route("[controller]/msgs/{Username}")]
+        [Route("[controller]/msgs/{UserName}")]
         [AllowAnonymous]
         public async Task<IActionResult> MessagesAsUser(string username, [FromBody] SimulatorMessageCreationDTO messageDTO)
         {
@@ -137,7 +137,7 @@ namespace Minitwit.Controllers
         }
 
         [HttpGet]
-        [Route("[controller]/fllws/{Username}")]
+        [Route("[controller]/fllws/{UserName}")]
         [AllowAnonymous]
         public async Task<IActionResult> FollowsFromUser(string username, [FromQuery(Name = "no")] int limit = 100)
         {
@@ -146,11 +146,11 @@ namespace Minitwit.Controllers
             
             var filteredMessages = await _context.Users
                 .Include(u => u.Follows)
-                .Where(u => u.Username == username)
+                .Where(u => u.UserName == username)
                 .Select(u => new
                 {
                     follows = u.Follows
-                        .Select(u2 => u2.Username)
+                        .Select(u2 => u2.UserName)
                         .Take(limit)
                 })
                 .ToListAsync();
@@ -159,7 +159,7 @@ namespace Minitwit.Controllers
         }
 
         [HttpPost]
-        [Route("[controller]/fllws/{Username}")]
+        [Route("[controller]/fllws/{UserName}")]
         [AllowAnonymous]
         public async Task<IActionResult> FollowAsUser(string username, [FromBody] SimulatorFollowOrUnfollowDTO followDTO)
         {
