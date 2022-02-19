@@ -13,16 +13,15 @@ namespace Minitwit.Services
             _context = context;
         }
 
-        public async Task<Result> CreateUser(UserCreationDTO userCreationDTO)
+        public async Task<Result> CreateUser(UserRegistrationDTO userRegistrationDto)
         {
 
             //Todo real user creation this is just so i can test the simulator api
             _context.Users.Add(new User()
             {
-                Username = userCreationDTO.username,
-                Email = userCreationDTO.email,
-                PasswordHash = userCreationDTO.pwd,
-                Salt = ""
+                UserName = userRegistrationDto.username,
+                Email = userRegistrationDto.email,
+                PasswordHash = userRegistrationDto.pwd,
             });
             await _context.SaveChangesAsync();
             return Result.Created;

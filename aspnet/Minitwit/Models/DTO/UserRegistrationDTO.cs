@@ -3,7 +3,7 @@
 namespace Minitwit.Models.DTO
 {
 
-        public class UserCreationDTO
+        public class UserRegistrationDTO
         {
             [Required(ErrorMessage = "A username is required")]
             public string username { get; set; }
