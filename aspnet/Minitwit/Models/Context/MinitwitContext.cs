@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Entity;
 
 namespace Minitwit.Models.Context
 {
-    public class MinitwitContext : DbContext
+    public class MinitwitContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public MinitwitContext(DbContextOptions<MinitwitContext> options) : base(options)
         {
@@ -14,8 +16,9 @@ namespace Minitwit.Models.Context
         public DbSet<Latest> Latest { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { 
-            modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
 
             modelBuilder.Entity<User>().HasMany(u => u.FollowedBy);
 

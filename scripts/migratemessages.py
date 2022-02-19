@@ -2,7 +2,7 @@ import sqlite3
 from  urllib import request, parse
 import requests
 
-API_ENDPOINT = "https://localhost:7077/Messages/Create"
+API_ENDPOINT = "https://localhost:7077/Messages/MigrationCreate"
 DATABASE = "../pyshite/minitwit.db"
 conn = sqlite3.connect(DATABASE)
 cur = conn.cursor()

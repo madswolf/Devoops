@@ -4,6 +4,6 @@ namespace Minitwit.Services
 {
     public interface IUserService
     {
-        public Task<Result> CreateUser(UserCreationDTO userCreationDTO);
+        public Task<Result> CreateUser(UserRegistrationDTO userRegistrationDto);
     }
 }
