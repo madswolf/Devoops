@@ -21,7 +21,7 @@ namespace Minitwit.DatabaseUtil
 
         public async Task<User?> GetUserByUsername(string username)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
         public async Task<User?> GetUserById(int id)
