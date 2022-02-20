@@ -1,0 +1,53 @@
+﻿@inherits LayoutComponentBase
+@using Minitwit.Models.Entity
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Components
+
+<div class="page">
+    <h1>MiniTwit</h1>
+
+    <div class=navigation>
+        @if (user is not null)
+        {
+            <a href="">my timeline</a>
+            <a href="">public timeline</a>
+            <a href="">sign out @user.UserName</a>
+        }
+        else
+        {
+            <a href="">public timeline</a>
+            <a href="register">sign up</a>
+            <a href="login">sign in</a>
+        }
+    </div>
+
+    @if (flashes is not null)
+    {
+        <ul class=flashes>
+            @foreach (var message in flashes)
+            {
+                <li> @message.Text </li>
+            }
+        </ul>
+    }
+
+    <div class=body>
+        @Body
+    </div>
+
+    <div class=footer>
+        MiniTwit; A Asp.net Application
+    </div>
+</div>
+
+@code {
+    private List<Message> flashes;
+    private User user;
+
+
+
+    private List<Message> get_flashed_messages()
+    {
+        throw new NotImplementedException();
+    }
+}
