@@ -1,12 +1,43 @@
 ﻿@page "/"
+@inject HttpClient http
+@using Minitwit.Models.DTO
 @using Minitwit.Models.Entity
 @using Minitwit.Controllers
 
-<h2>Public Timeline</h2>
+
+<h2>@Title</h2>
+
+@if (user is not null) {
+    @*@if () {
+        <div class=followstatus>
+            {% if g.user.user_id == profile_user.user_id %}
+            This is you!
+            {% elif followed %}
+            You are currently following this user.
+            <a class=unfollow href="{{ url_for('unfollow_user', username=profile_user.username)
+              }}">Unfollow user</a>.
+            {% else %}
+            You are not yet following this user.
+            <a class=follow href="{{ url_for('follow_user', username=profile_user.username)
+              }}">Follow user</a>.
+        </div>
+    }
+    else if () {
+        <div class=twitbox>
+            <h3>What's on your mind @user.UserName?</h3>
+            @*implement add message controller
+            <form action="" method=post>
+                <input type=text name=text size=60>
+                <input type=submit value="Share">
+            </form>
+        </div>
+    }*@
+}
+
 <ul class=messages>
     @if (messages.Any()){
         @foreach (var message in messages){
-            @*Implement image & user timeline linkg*@
+            @*Implement image & user timeline link*@
             <li><p>
                 <strong><a href="">@message.Author</a></strong>
                 @message.Text
@@ -22,10 +53,20 @@
 
 @code {
     private User user;
+    private string Title;
     private List<Message> messages = new List<Message>();
 
     protected override async Task OnInitializedAsync()
     {
-           
+        messages = await http.GetFromJsonAsync<List<Message>>("/timeline/timeline/public");
+
+        if (user == null)
+        {
+            Title = "Public Timeline";
+        }
+        else
+        {
+            Title = $"{user.UserName}'s Timeline";
+        }
     }
 }
