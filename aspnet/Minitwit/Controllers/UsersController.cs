@@ -50,9 +50,28 @@ namespace Minitwit.Controllers
             return Ok();
         }
 
-        //Todo login
+        [HttpPost]
+        [Route("[controller]/login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+        {
+            var user = await _userManager.FindByNameAsync(loginDTO.username);
+            // Hypothetical email-reset if pwd null
+            if (user.PasswordHash == null)
+            {
+                return BadRequest("Password uses old hashing function. (change password with the link sent to your email)");
+            }
+            await _signInManager.SignInAsync(user, false);
+            return Ok();
+        }
 
-        //Todo logoff
+        [HttpPost]
+        [Route("[controller]/logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
 
 
         // GET: Users
