@@ -37,10 +37,10 @@ namespace Minitwit.Controllers
             return Ok(new
             {
                 latest =
-                    _context.Latest
+                    await _context.Latest
                         .OrderByDescending(l => l.CreationTime)
                         .Select(l => l.Value)
-                        .FirstOrDefault()
+                        .FirstOrDefaultAsync()
                     
             });
         }
@@ -50,7 +50,7 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userDTO)
         {
-            UpdateLatest();
+            await UpdateLatest();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
             var user = new User()
@@ -200,7 +200,7 @@ namespace Minitwit.Controllers
             return Request.Headers["Authorization"].Equals($"Basic {simulatorAPIToken}");
         }
 
-        private async void UpdateLatest()
+        private async Task<int> UpdateLatest()
         {
             var isLatestInQuery = Request.Query.TryGetValue("latest", out var latestString);
             if (isLatestInQuery)
@@ -213,6 +213,8 @@ namespace Minitwit.Controllers
                 _context.Latest.Add(latest);
                 await _context.SaveChangesAsync();
             }
+            // dumb return value to allow for awaiting this function
+            return 1;
         }
     }
 }
