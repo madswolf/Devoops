@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
@@ -15,14 +16,16 @@ namespace Minitwit.Controllers
     {
         private readonly MinitwitContext _context;
         private readonly IEntityAccessor _entityAccessor;
-        private readonly IUserService _userService;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
-        public SimulatorController(MinitwitContext context, IEntityAccessor entityAccessor, IUserService userService)
+        public SimulatorController(MinitwitContext context, IEntityAccessor entityAccessor, SignInManager<User> signInManager, UserManager<User> userManager)
         {
             _context = context;
             _entityAccessor = entityAccessor;
-            _userService = userService;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -50,13 +53,16 @@ namespace Minitwit.Controllers
             UpdateLatest();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
-            return await _userService.CreateUser(userDTO) switch
+            var user = new User()
             {
-                Result.Conflict => StatusCode(400),
-                Result.Created => StatusCode(204),
-                //should never happen
-                _ => throw new Exception()
+                UserName = userDTO.username,
+                Email = userDTO.email
             };
+
+            var result = await _userManager.CreateAsync(user, userDTO.pwd);
+            if (!result.Succeeded) return BadRequest(result);
+            await _signInManager.SignInAsync(user, false);
+            return Ok();
         }
 
         [HttpGet]

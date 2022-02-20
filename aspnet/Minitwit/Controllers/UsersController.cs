@@ -21,13 +21,11 @@ namespace Minitwit.Controllers
     public class UsersController : Controller
     {
         private readonly MinitwitContext _context;
-        private readonly IUserService _userService;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        public UsersController(MinitwitContext context, IUserService userService, SignInManager<User> signInManager, UserManager<User> userManager)
+        public UsersController(MinitwitContext context, SignInManager<User> signInManager, UserManager<User> userManager)
         {
             _context = context;
-            _userService = userService;
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -58,14 +56,17 @@ namespace Minitwit.Controllers
         {
             var user = await _userManager.FindByNameAsync(loginDTO.username);
             if (user == null) return BadRequest("User does not exist");
+            
             // Hypothetical email-reset if pwd null
             if (user.PasswordHash == null)
             {
                 return BadRequest("Password uses old hashing function. (change password with the link sent to your email)");
             }
-            if (_userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDTO.pwd)
-                == PasswordVerificationResult.Failed) return Unauthorized("Wrong password");
-            await _signInManager.SignInAsync(user, false);
+
+            var result = await _signInManager.PasswordSignInAsync(user, loginDTO.pwd, loginDTO.rememberMe, false);
+
+            if (!result.Succeeded) return Unauthorized();
+
             return Ok();
         }
 
@@ -73,11 +74,12 @@ namespace Minitwit.Controllers
         [Route("[controller]/logout")]
         public async Task<IActionResult> Logout()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("Index");
             await _signInManager.SignOutAsync();
             return Ok();
         }
-
-
+        
         // GET: Users
         public async Task<IActionResult> Index()
         {
@@ -108,23 +110,6 @@ namespace Minitwit.Controllers
             return View();
         }
 
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody]UserRegistrationDTO userDTO)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
-
-            return await _userService.CreateUser(userDTO) switch
-            {
-                Result.Conflict => StatusCode(413),
-                Result.Created => StatusCode(201),
-                //should never happen
-                _ => throw new Exception()
-            };
-        }
-        
         [HttpPost]
         public async Task<IActionResult> MigrationCreate([FromBody] UserDTO user)
         {
