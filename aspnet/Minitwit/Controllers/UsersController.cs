@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -62,6 +63,8 @@ namespace Minitwit.Controllers
             {
                 return BadRequest("Password uses old hashing function. (change password with the link sent to your email)");
             }
+            if (_userManager.PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDTO.pwd)
+                == PasswordVerificationResult.Failed) return Unauthorized("Wrong password");
             await _signInManager.SignInAsync(user, false);
             return Ok();
         }
