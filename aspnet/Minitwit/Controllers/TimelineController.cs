@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Minitwit.DatabaseUtil;
 using Minitwit.Models.Context;
 using Minitwit.Services;
 
@@ -9,29 +11,28 @@ namespace Minitwit.Controllers
     public class TimelineController : Controller
     {
         private readonly MinitwitContext _context;
-        private readonly IUserService _userService;
+        private readonly IEntityAccessor _entityAccessor;
         private const int PER_PAGE = 30;
 
-        public TimelineController(MinitwitContext context, IUserService userService)
+        public TimelineController(MinitwitContext context, IEntityAccessor entityAccessor)
         {
             _context = context;
-            _userService = userService;
+            _entityAccessor = entityAccessor;
         }
 
 
         [HttpGet]
         [Route("[controller]/timeline")]
-        public async Task<IActionResult> PrivateTimeline(int id)
+        public async Task<IActionResult> PrivateTimeline()
         {
-            //Todo get the id from authentication
-
             //Todo Redirect to public timeline
-            if (!UserExists(id)) return RedirectToAction(nameof(PublicTimeline));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction(nameof(PublicTimeline));
 
             var postsAndFollows = await _context.Users
                 .Include(u => u.Messages)
                 .Include(u => u.Follows)
-                .Where(u => u.Id == id)
+                .Where(u => u.Id == int.Parse(userId))
                 .Select(u => new
                 {
                     u.Messages,
@@ -95,11 +96,6 @@ namespace Minitwit.Controllers
                 postsAndIsFollowing.messages,
                 postsAndIsFollowing.follows
             });
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
