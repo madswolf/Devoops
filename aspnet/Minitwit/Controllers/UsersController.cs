@@ -56,6 +56,7 @@ namespace Minitwit.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             var user = await _userManager.FindByNameAsync(loginDTO.username);
+            if (user == null) return BadRequest("User does not exist");
             // Hypothetical email-reset if pwd null
             if (user.PasswordHash == null)
             {
