@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<MinitwitContext>();
 
 builder.Services.AddDbContext<MinitwitContext>(options =>
@@ -31,7 +31,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEntityAccessor, EntityAccessor>();
 
 var app = builder.Build();

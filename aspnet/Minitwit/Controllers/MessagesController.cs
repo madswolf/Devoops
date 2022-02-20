@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,13 +25,14 @@ namespace Minitwit.Controllers
 
         [HttpPost]
         [Route("[Controller]/{username}/Follow")]
-        public async Task<IActionResult> Follow(string username, int id)
+        public async Task<IActionResult> Follow(string username)
         {
-            //Todo get the id from authentication
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("login", "Users");
 
             User whom = _context.Users
                 .Include(u => u.FollowedBy)
-                .FirstOrDefault(u => u.Id == id);
+                .FirstOrDefault(u => u.Id == int.Parse(userId));
 
             User who = _context.Users
                 .Include(u => u.Follows)
@@ -52,13 +54,14 @@ namespace Minitwit.Controllers
         //Todo If this is not too much trouble in the front end, lets simply make 1 endpoint and a boolean for follow/unfollow
         [HttpPost]
         [Route("[Controller]/{username}/unFollow")]
-        public async Task<IActionResult> UnFollow(string username, int id)
+        public async Task<IActionResult> UnFollow(string username)
         {
-            //Todo get the id from authentication
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("login", "Users");
 
             User whom = _context.Users
                 .Include(u => u.FollowedBy)
-                .FirstOrDefault(u => u.Id == id);
+                .FirstOrDefault(u => u.Id == int.Parse(userId));
 
             User who = _context.Users
                 .Include(u => u.Follows)
@@ -76,13 +79,14 @@ namespace Minitwit.Controllers
 
         [HttpPost]
         [Route("[controller]/PostMessage")]
-        public async Task<IActionResult> PostMessage([FromBody] string text, int id)
-        {
-            //Todo get the id from authentication
+        public async Task<IActionResult> PostMessage([FromBody] string text)
+        { 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("login","Users");
 
             if (!ModelState.IsValid) return BadRequest("Text is required");
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == int.Parse(userId));
 
             Message newMessage = new Message()
             {
