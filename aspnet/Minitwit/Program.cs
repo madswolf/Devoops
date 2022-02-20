@@ -13,8 +13,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<MinitwitContext>();
 
-// This transient helps for some reason xD
-builder.Services.AddDbContext<MinitwitContext>(optionsAction: options => { options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit")); });
+builder.Services.AddDbContext<MinitwitContext>(
+    optionsAction: options => { options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit")); });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
