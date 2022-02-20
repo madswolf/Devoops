@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Minitwit.DatabaseUtil;
 using Minitwit.Models.Context;
+using Minitwit.Models.Entity;
+using Minitwit.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,13 +11,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRazorPages();
+
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddEntityFrameworkStores<MinitwitContext>();
+
 builder.Services.AddDbContext<MinitwitContext>(options =>
 {
-    options.UseInMemoryDatabase("Test");
-    //options.UseNpgsql("host=db-postgresql-fra1-40527-do-user-10842035-0.b.db.ondigitalocean.com;database=defaultdb;user id=doadmin;password=hYj0D9znk3OpXyIi;port=25060");
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit"));
 });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Cookie settings
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.SlidingExpiration = true;
+});
+
+builder.Services.AddScoped<IEntityAccessor, EntityAccessor>();
 
 var app = builder.Build();
 
@@ -39,8 +59,11 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+
+
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
