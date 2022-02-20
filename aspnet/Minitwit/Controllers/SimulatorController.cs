@@ -37,10 +37,10 @@ namespace Minitwit.Controllers
             return Ok(new
             {
                 latest =
-                    _context.Latest
+                    await _context.Latest
                         .OrderByDescending(l => l.CreationTime)
                         .Select(l => l.Value)
-                        .FirstOrDefault()
+                        .FirstOrDefaultAsync()
                     
             });
         }
@@ -50,7 +50,7 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userDTO)
         {
-            UpdateLatest();
+            await UpdateLatestAsync();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
             var user = new User()
@@ -70,10 +70,10 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Messages([FromQuery(Name = "no")] int limit = 100)
         {
-            UpdateLatest();
+            await UpdateLatestAsync();
             if (IsRequestFromSimulator())
             {
-                var filteredMessages = _context.Posts
+                var filteredMessages = await _context.Posts
                     .Include(p => p.Author)
                     .Where(p => !p.Flagged)
                     .OrderByDescending(p => p.PublishDate)
@@ -83,7 +83,7 @@ namespace Minitwit.Controllers
                         content = p.Text,
                         pub_date = p.PublishDate,
                         user = p.Author.UserName
-                    });
+                    }).ToListAsync();
 
                 return Ok(filteredMessages);
             }
@@ -96,7 +96,7 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> MessagesFromUser(string username, [FromQuery(Name = "no")] int limit = 100)
         {
-            UpdateLatest();
+            await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
 
             var filteredMessages = await _context.Posts
@@ -121,7 +121,7 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> MessagesAsUser(string username, [FromBody] SimulatorMessageCreationDTO messageDTO)
         {
-            UpdateLatest();
+            await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
@@ -131,7 +131,8 @@ namespace Minitwit.Controllers
                 return NotFound($"User with name {username} not found");
             }
 
-            _context.Posts.Add(new Message()
+            Console.Write("-------------------------------");
+            await _context.Posts.AddAsync(new Message()
             {
                 Text = messageDTO.content,
                 Author = user,
@@ -147,7 +148,7 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> FollowsFromUser(string username, [FromQuery(Name = "no")] int limit = 100)
         {
-            UpdateLatest();
+            await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
             
             var filteredMessages = await _context.Users
@@ -160,8 +161,9 @@ namespace Minitwit.Controllers
                         .Take(limit)
                 })
                 .ToListAsync();
-
-            return Ok(filteredMessages);
+            
+            // TODO: dirty solution with [0] to not return list, we could maybe use get user query to fix that elegantly
+            return Ok(filteredMessages[0]);
         }
 
         [HttpPost]
@@ -169,7 +171,7 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> FollowAsUser(string username, [FromBody] SimulatorFollowOrUnfollowDTO followDTO)
         {
-            UpdateLatest();
+            await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
 
             var follower = await _entityAccessor.GetUserByUsername(username);
@@ -200,7 +202,7 @@ namespace Minitwit.Controllers
             return Request.Headers["Authorization"].Equals($"Basic {simulatorAPIToken}");
         }
 
-        private async void UpdateLatest()
+        private async Task<int> UpdateLatestAsync()
         {
             var isLatestInQuery = Request.Query.TryGetValue("latest", out var latestString);
             if (isLatestInQuery)
@@ -213,6 +215,8 @@ namespace Minitwit.Controllers
                 _context.Latest.Add(latest);
                 await _context.SaveChangesAsync();
             }
+            // dumb return value to allow for awaiting this function
+            return 1;
         }
     }
 }

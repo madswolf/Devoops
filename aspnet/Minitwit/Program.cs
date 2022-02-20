@@ -14,10 +14,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<MinitwitContext>();
 
-builder.Services.AddDbContext<MinitwitContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit"));
-});
+builder.Services.AddDbContext<MinitwitContext>(
+    optionsAction: options => { options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit")); });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -33,6 +31,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddScoped<IEntityAccessor, EntityAccessor>();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 1;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+});
 
 var app = builder.Build();
 
@@ -55,9 +62,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Disabled for testing purposes
+// app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 
 
 app.UseRouting();
