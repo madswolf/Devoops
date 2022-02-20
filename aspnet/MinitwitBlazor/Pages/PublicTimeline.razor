@@ -1,0 +1,31 @@
+﻿@page "/"
+@using Minitwit.Models.Entity
+@using Minitwit.Controllers
+
+<h2>Public Timeline</h2>
+<ul class=messages>
+    @if (messages.Any()){
+        @foreach (var message in messages){
+            @*Implement image & user timeline linkg*@
+            <li><p>
+                <strong><a href="">@message.Author</a></strong>
+                @message.Text
+                <small>&mdash; @message.PublishDate</small>
+            </p></li>
+        }
+    }
+    else {
+        <li><em>There's no message so far.</em></li>
+    }
+</ul>
+
+
+@code {
+    private User user;
+    private List<Message> messages = new List<Message>();
+
+    protected override async Task OnInitializedAsync()
+    {
+           
+    }
+}
