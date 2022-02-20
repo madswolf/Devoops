@@ -1,8 +1,12 @@
 ﻿#nullable disable
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Scripting.Hosting;
@@ -10,18 +14,72 @@ using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
+using Minitwit.Services;
 
 namespace Minitwit.Controllers
 {
     public class UsersController : Controller
     {
         private readonly MinitwitContext _context;
-
-        public UsersController(MinitwitContext context)
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+        public UsersController(MinitwitContext context, SignInManager<User> signInManager, UserManager<User> userManager)
         {
             _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
+        [HttpPost]
+        [Route("[controller]/register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userDTO)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
+
+            var user = new User()
+            {
+                UserName = userDTO.username,
+                Email = userDTO.email
+            };
+            
+            var result = await _userManager.CreateAsync(user, userDTO.pwd);
+            if (!result.Succeeded) return BadRequest(result);
+            await _signInManager.SignInAsync(user, false);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("[controller]/login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+        {
+            var user = await _userManager.FindByNameAsync(loginDTO.username);
+            if (user == null) return BadRequest("User does not exist");
+            
+            // Hypothetical email-reset if pwd null
+            if (user.PasswordHash == null)
+            {
+                return BadRequest("Password uses old hashing function. (change password with the link sent to your email)");
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(user, loginDTO.pwd, loginDTO.rememberMe, false);
+
+            if (!result.Succeeded) return Unauthorized();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("[controller]/logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return RedirectToAction("Index");
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
+        
         // GET: Users
         public async Task<IActionResult> Index()
         {
@@ -52,39 +110,31 @@ namespace Minitwit.Controllers
             return View();
         }
 
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create( UserDTO user)
+        public async Task<IActionResult> MigrationCreate([FromBody] UserDTO user)
         {
-            if (ModelState.IsValid)
-            {
-                Console.WriteLine();
-            }
-
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
             User newUser = new User
             {
-                Username = user.Username,
+                UserName = user.Username,
                 PasswordHash = user.PasswordHash,
-                Salt = user.Salt,
                 Email = user.Email
             };
-            _context.Add(newUser);
+            _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
             return Ok();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Follow(FollowDTO followDto)
+        public async Task<IActionResult> MigrationFollow(FollowDTO followDto)
         {
             User whom = _context.Users
                 .Include(u => u.FollowedBy)
-                .FirstOrDefault(u => u.Username  == followDto.Whom);
+                .FirstOrDefault(u => u.UserName  == followDto.Whom);
 
             User who = _context.Users
                 .Include(u => u.Follows)
-                .FirstOrDefault(u => u.Username == followDto.Who);
+                .FirstOrDefault(u => u.UserName == followDto.Who);
 
             if (whom != null && who != null)
             {
@@ -115,7 +165,7 @@ namespace Minitwit.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,PasswordHash,Email")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserName,PasswordHash,Email")] User user)
         {
             if (id != user.Id)
             {
