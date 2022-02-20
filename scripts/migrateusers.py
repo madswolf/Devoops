@@ -4,7 +4,7 @@ import requests
 import ssl
 import json
 
-API_ENDPOINT = "https://localhost:7077/Users/Create"
+API_ENDPOINT = "https://localhost:7077/Users/MigrationCreate"
 DATABASE = "../pyshite/minitwit.db"
 conn = sqlite3.connect(DATABASE)
 cur = conn.cursor()
@@ -23,6 +23,7 @@ def post_user(record):
     user_name = record[1]
     email = record[2]
     salt, hash = parse_hash(record[3])
+    
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
