@@ -42,7 +42,9 @@ namespace Minitwit.Controllers
                 UserName = userDTO.username,
                 Email = userDTO.email
             };
-            
+            if (_context.Users.Any(u => u.UserName == user.UserName))
+                return Conflict($"User with {user.UserName} already exists");
+
             var result = await _userManager.CreateAsync(user, userDTO.pwd);
             if (!result.Succeeded) return BadRequest(result);
             await _signInManager.SignInAsync(user, false);
@@ -105,13 +107,13 @@ namespace Minitwit.Controllers
         }
 
         // GET: Users/Create
-        public IActionResult Create()
-        {
-            return View();
+            public IActionResult Create()
+            {
+                return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> MigrationCreate([FromBody] UserDTO user)
+        public async Task<IActionResult> MigrationCreate(UserDTO user)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
             User newUser = new User
@@ -138,8 +140,11 @@ namespace Minitwit.Controllers
 
             if (whom != null && who != null)
             {
-                whom.FollowedBy.Add(who);
-                who.Follows.Add(whom);
+                _context.Follows.Add(new Follow()
+                {
+                    FollowerId = who.Id,
+                    FolloweeId = whom.Id,
+                });
             }
             await _context.SaveChangesAsync();
             return Ok();

@@ -10,12 +10,12 @@ namespace Minitwit.Models.Entity
     {
         public User() 
         {
-            this.Follows = new List<User>();
-            this.FollowedBy = new List<User>();
+            this.Follows = new List<Follow>();
+            this.FollowedBy = new List<Follow>();
             this.Messages = new List<Message>();
         }
-        public List<User> Follows { get; set; }
-        public List<User> FollowedBy { get; set; }
+        public List<Follow> Follows { get; set; }
+        public List<Follow> FollowedBy { get; set; }
         public List<Message> Messages { get; set; }
     }
 }

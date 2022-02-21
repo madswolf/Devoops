@@ -172,6 +172,30 @@ namespace Minitwit.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Follows",
+                columns: table => new
+                {
+                    FollowerId = table.Column<int>(type: "integer", nullable: false),
+                    FolloweeId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Follows", x => new { x.FollowerId, x.FolloweeId });
+                    table.ForeignKey(
+                        name: "FK_Follows_AspNetUsers_FolloweeId",
+                        column: x => x.FolloweeId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Follows_AspNetUsers_FollowerId",
+                        column: x => x.FollowerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Posts",
                 columns: table => new
                 {
@@ -188,30 +212,6 @@ namespace Minitwit.Migrations
                     table.ForeignKey(
                         name: "FK_Posts_AspNetUsers_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserUser",
-                columns: table => new
-                {
-                    FollowedById = table.Column<int>(type: "integer", nullable: false),
-                    FollowsId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserUser", x => new { x.FollowedById, x.FollowsId });
-                    table.ForeignKey(
-                        name: "FK_UserUser_AspNetUsers_FollowedById",
-                        column: x => x.FollowedById,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserUser_AspNetUsers_FollowsId",
-                        column: x => x.FollowsId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -261,14 +261,39 @@ namespace Minitwit.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_AuthorId",
-                table: "Posts",
-                column: "AuthorId");
+                name: "IX_Follows_FolloweeId_FollowerId",
+                table: "Follows",
+                columns: new[] { "FolloweeId", "FollowerId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserUser_FollowsId",
-                table: "UserUser",
-                column: "FollowsId");
+                name: "IX_Follows_FollowerId_FolloweeId",
+                table: "Follows",
+                columns: new[] { "FollowerId", "FolloweeId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Latest_CreationTime_Value",
+                table: "Latest",
+                columns: new[] { "CreationTime", "Value" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_AuthorId_PublishDate",
+                table: "Posts",
+                columns: new[] { "AuthorId", "PublishDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_Flagged_AuthorId_PublishDate",
+                table: "Posts",
+                columns: new[] { "Flagged", "AuthorId", "PublishDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_Flagged_PublishDate",
+                table: "Posts",
+                columns: new[] { "Flagged", "PublishDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_PublishDate",
+                table: "Posts",
+                column: "PublishDate");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -289,13 +314,13 @@ namespace Minitwit.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Follows");
+
+            migrationBuilder.DropTable(
                 name: "Latest");
 
             migrationBuilder.DropTable(
                 name: "Posts");
-
-            migrationBuilder.DropTable(
-                name: "UserUser");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
