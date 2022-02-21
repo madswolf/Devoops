@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Minitwit.Controllers;
 using Minitwit.DatabaseUtil;
 using Minitwit.Models.Context;
+using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 using Minitwit.Services;
 
@@ -34,11 +36,14 @@ builder.Services.AddScoped<IEntityAccessor, EntityAccessor>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
+    options.Lockout.MaxFailedAccessAttempts = 1000;
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 1;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
+    options.User.AllowedUserNameCharacters =
+        "abcdefghijklmnopqrstuvwxyz���ABCDEFGHIJKLMNOPQRSTUVWXYZ���0123456789-._@+ ";
 });
 
 var app = builder.Build();
@@ -77,5 +82,12 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+//Preload data model (to speed up the first few requests)
+var thing = builder.Services.BuildServiceProvider().GetService<MinitwitContext>();
+thing.Follows.FirstOrDefaultAsync();
+thing.Users.FirstOrDefaultAsync();
+thing.Posts.FirstOrDefaultAsync();
+thing.Latest.FirstOrDefaultAsync();
 
 app.Run();
