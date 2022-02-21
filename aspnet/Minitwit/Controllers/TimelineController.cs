@@ -44,7 +44,7 @@ namespace Minitwit.Controllers
             var followsPosts = await _context.Posts
                 .Include(p => p.Author)
                 .Where(p => !p.Flagged)
-                .Where(p => postsAndFollows.Follows.Exists(u => u.Id == p.Author.Id))
+                .Where(p => postsAndFollows.Follows.Exists(f => f.FolloweeId == p.Author.Id))
                 .Concat(postsAndFollows.Messages)
                 .OrderByDescending(p => p.PublishDate)
                 .Take(PER_PAGE)
@@ -85,7 +85,7 @@ namespace Minitwit.Controllers
                         messages = u.Messages
                             .OrderByDescending(p => p.PublishDate)
                             .Take(PER_PAGE),
-                        follows = u.Follows.Exists(u => u.Id == user.Id)
+                        follows = u.Follows.Exists(f => f.FolloweeId == user.Id)
                     }
                 )
                 .FirstOrDefaultAsync();
