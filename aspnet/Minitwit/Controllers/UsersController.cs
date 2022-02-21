@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -30,10 +31,19 @@ namespace Minitwit.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet]
+        [Route("[controller]/register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register()
+        {
+            return View();
+        }
+
         [HttpPost]
         [Route("[controller]/register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userDTO)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(UserRegistrationDTO userDTO)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
@@ -47,14 +57,24 @@ namespace Minitwit.Controllers
 
             var result = await _userManager.CreateAsync(user, userDTO.pwd);
             if (!result.Succeeded) return BadRequest(result);
-            await _signInManager.SignInAsync(user, false);
-            return Ok();
+            await _signInManager.SignInAsync(user, userDTO.rememberMe);
+            return RedirectToAction("Private_Timeline","Minitwit");
+        }
+
+        [HttpGet]
+        [Route("[controller]/login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
         }
 
         [HttpPost]
         [Route("[controller]/login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
             var user = await _userManager.FindByNameAsync(loginDTO.username);
             if (user == null) return BadRequest("User does not exist");
@@ -69,17 +89,17 @@ namespace Minitwit.Controllers
 
             if (!result.Succeeded) return Unauthorized();
 
-            return Ok();
+            return RedirectToAction("Private_Timeline", "Minitwit");
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("[controller]/logout")]
         public async Task<IActionResult> Logout()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null) return RedirectToAction("Index");
+            if (userId == null) return RedirectToAction("Public_Timeline", "Minitwit");
             await _signInManager.SignOutAsync();
-            return Ok();
+            return RedirectToAction("Public_Timeline", "Minitwit");
         }
         
         // GET: Users
