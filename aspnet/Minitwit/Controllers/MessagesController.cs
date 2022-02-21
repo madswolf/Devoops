@@ -30,18 +30,22 @@ namespace Minitwit.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return RedirectToAction("login", "Users");
 
-            User whom = _context.Users
-                .Include(u => u.FollowedBy)
+            User follower = _context.Users
+                .Include(u => u.Follows)
                 .FirstOrDefault(u => u.Id == int.Parse(userId));
 
-            User who = _context.Users
-                .Include(u => u.Follows)
+            User followee = _context.Users
+                .Include(u => u.FollowedBy)
                 .FirstOrDefault(u => u.UserName == username);
 
-            if (who == null) return NotFound($"User with name {username} not found");
-
-            whom.FollowedBy.Add(who);
-            who.Follows.Add(whom);
+            if (followee == null) return NotFound($"User with name {username} not found");
+            if (_context.Follows.Any(f => f.FolloweeId == followee.Id && f.FollowerId == follower.Id))
+                    return Conflict($"User is already following {username}");
+            _context.Follows.Add(new Follow()
+            {
+                FollowerId = follower.Id,
+                FolloweeId = followee.Id,
+            });
             await _context.SaveChangesAsync();
 
 
@@ -59,18 +63,23 @@ namespace Minitwit.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return RedirectToAction("login", "Users");
 
-            User whom = _context.Users
-                .Include(u => u.FollowedBy)
+            User follower = _context.Users
+                .Include(u => u.Follows)
                 .FirstOrDefault(u => u.Id == int.Parse(userId));
 
-            User who = _context.Users
-                .Include(u => u.Follows)
+            User followee = _context.Users
+                .Include(u => u.FollowedBy)
                 .FirstOrDefault(u => u.UserName == username);
 
-            if (who == null) return NotFound($"User with name {username} not found");
-
-            whom.FollowedBy.Remove(who);
-            who.Follows.Remove(whom);
+            if (followee == null) return NotFound($"User with name {username} not found");
+            if (!_context.Follows.Any(f => f.FolloweeId == followee.Id && f.FollowerId == follower.Id))
+                return NotFound();
+            _context.Follows.Remove(new Follow()
+            {
+                FollowerId = follower.Id,
+                FolloweeId = followee.Id
+            });
+            
             await _context.SaveChangesAsync();
 
             //Todo Redirect to private timeline
@@ -86,11 +95,9 @@ namespace Minitwit.Controllers
 
             if (!ModelState.IsValid) return BadRequest("Text is required");
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == int.Parse(userId));
-
             Message newMessage = new Message()
             {
-                Author = user,
+                AuthorId = int.Parse(userId),
                 Text = text,
                 PublishDate = DateTime.UtcNow
             };
