@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +17,10 @@ namespace Minitwit.Controllers
     {
         private readonly MinitwitContext _context;
         private readonly IEntityAccessor _entityAccessor;
+
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
+        
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
         public SimulatorController(MinitwitContext context, IEntityAccessor entityAccessor, SignInManager<User> signInManager, UserManager<User> userManager)
@@ -33,7 +36,6 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Latest()
         {
-            
             return Ok(new
             {
                 latest =
@@ -59,10 +61,13 @@ namespace Minitwit.Controllers
                 Email = userDTO.email
             };
 
+            if (_context.Users.Any(u => u.UserName == user.UserName))
+                return StatusCode(400);
+
             var result = await _userManager.CreateAsync(user, userDTO.pwd);
             if (!result.Succeeded) return BadRequest(result);
             await _signInManager.SignInAsync(user, false);
-            return Ok();
+            return StatusCode(204);
         }
 
         [HttpGet]
@@ -151,19 +156,24 @@ namespace Minitwit.Controllers
             await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
             
-            var filteredMessages = await _context.Users
+            var follows = await _context.Users
                 .Include(u => u.Follows)
                 .Where(u => u.UserName == username)
                 .Select(u => new
                 {
                     follows = u.Follows
+                        .Join(
+                            _context.Users,
+                            f => f.FolloweeId,
+                            u => u.Id,
+                            (f,u) => u
+                            )
                         .Select(u2 => u2.UserName)
                         .Take(limit)
                 })
-                .ToListAsync();
+                .FirstOrDefaultAsync();
             
-            // TODO: dirty solution with [0] to not return list, we could maybe use get user query to fix that elegantly
-            return Ok(filteredMessages[0]);
+            return Ok(follows);
         }
 
         [HttpPost]
@@ -182,19 +192,34 @@ namespace Minitwit.Controllers
             {
                 var followee = await _entityAccessor.GetUserByUsername(followDTO.follow);
                 if (followee == null) return NotFound(followDTO.follow);
-                follower.Follows.Add(followee);
-                followee.Follows.Add(follower);
+                var following = _context.Follows.Any(f => f.FolloweeId == followee.Id && f.FollowerId == follower.Id);
+                if (following) return StatusCode(204);
+
+                _context.Follows.Add(new Follow()
+                {
+                    FollowerId = follower.Id,
+                    FolloweeId = followee.Id,
+                });
             }
             else if (followDTO?.unfollow != null)
             {
                 var unFollowee = await _entityAccessor.GetUserByUsername(followDTO.unfollow);
                 if (unFollowee == null) return NotFound(followDTO.unfollow);
-                follower.Follows.Remove(unFollowee);
-                unFollowee.Follows.Remove(follower);
+
+                var following = _context.Follows.Any(f => f.FolloweeId == unFollowee.Id && f.FollowerId == follower.Id);
+                if (!following)
+                    return StatusCode(204);
+                ;
+
+                _context.Follows.Remove(new Follow()
+                {
+                    FollowerId = follower.Id,
+                    FolloweeId = unFollowee.Id
+                });
             }
 
 
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
             return StatusCode(204);
         }
         private bool IsRequestFromSimulator()
