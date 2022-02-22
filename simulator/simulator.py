@@ -110,8 +110,6 @@ def main(host):
 
                 # build url for request
                 url = f"{host}/register"
-                
-                print(url)
 
                 # Set parameters: latest
                 params = {"latest": action["latest"]}
