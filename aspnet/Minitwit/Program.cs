@@ -89,8 +89,5 @@ app.MapRazorPages();
 //Preload data model (to speed up the first few requests)
 var thing = builder.Services.BuildServiceProvider().GetService<MinitwitContext>();
 thing.Follows.FirstOrDefaultAsync();
-thing.Users.FirstOrDefaultAsync();
-thing.Posts.FirstOrDefaultAsync();
-thing.Latest.FirstOrDefaultAsync();
 
 app.Run();
