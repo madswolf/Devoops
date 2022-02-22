@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Minitwit.Migrations
 {
     [DbContext(typeof(MinitwitContext))]
-    [Migration("20220220230116_InitialCreate")]
+    [Migration("20220222133411_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
