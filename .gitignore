@@ -402,3 +402,8 @@ aspnet/Minitwit/obj/project.assets.json
 aspnet/Minitwit/obj/project.nuget.cache
 *.cache
 *.props
+
+.vagrant/
+
+aspnet/id_rsa
+aspnet/key.txt
