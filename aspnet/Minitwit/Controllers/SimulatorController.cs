@@ -50,7 +50,7 @@ namespace Minitwit.Controllers
         [HttpPost]
         [Route("[Controller]/register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userDTO)
+        public async Task<IActionResult> Register([FromBody] SimulatorUserRegistrationDTO userDTO)
         {
             await UpdateLatestAsync();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
