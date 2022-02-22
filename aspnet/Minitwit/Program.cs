@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Minitwit.Controllers;
 using Minitwit.DatabaseUtil;
+using Minitwit.Models;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
@@ -18,6 +19,8 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
 
 builder.Services.AddDbContext<MinitwitContext>(
     optionsAction: options => { options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit")); });
+
+builder.Services.Configure<AppsettingsConfig>(builder.Configuration.GetSection("Secrets"));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
