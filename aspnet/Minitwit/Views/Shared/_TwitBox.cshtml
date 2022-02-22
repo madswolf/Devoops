@@ -1,0 +1,12 @@
+﻿@model Minitwit.Models.DTO.MessageCreationDTO
+
+<div class="twitbox">
+    <h3>What's on your mind @User.Identity.Name ?</h3>
+    <form
+        asp-controller="Minitwit"
+        asp-action="PostMessage"
+        method="post">
+        <p/>
+        <input asp-for="Text" required/><input type=submit value="Share">
+    </form>
+</div>

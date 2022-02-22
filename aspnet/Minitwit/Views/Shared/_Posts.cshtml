@@ -1,0 +1,29 @@
+﻿@model List<Minitwit.Models.Entity.Message>
+
+<ul class="messages">
+    @{
+        var messages = Model;
+    }
+    @if (messages.Any())
+    {
+        @foreach (var message in messages)
+        {
+            <li>
+                <img gravatar-email="@message.Author.Email" gravatar-size="48" alt="Picture for @message.Author.UserName"/>
+                <strong>
+                    <a asp-controller="Minitwit" asp-action="User_Timeline" asp-route-username="@message.Author.UserName">@message.Author.UserName</a>
+                </strong>
+                @message.Text
+                <small>
+                    &mdash; @message.PublishDate
+                </small>
+            </li>
+        }
+    }
+    else
+    {
+        <li>
+            <em>There's no message so far.</em>
+        </li>
+    }
+</ul>

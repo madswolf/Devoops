@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Minitwit.Migrations
 {
     [DbContext(typeof(MinitwitContext))]
-    [Migration("20220219063732_InitialCreate")]
+    [Migration("20220220230116_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,6 +160,23 @@ namespace Minitwit.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Minitwit.Models.Entity.Follow", b =>
+                {
+                    b.Property<int>("FollowerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FolloweeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("FollowerId", "FolloweeId");
+
+                    b.HasIndex("FolloweeId", "FollowerId");
+
+                    b.HasIndex("FollowerId", "FolloweeId");
+
+                    b.ToTable("Follows");
+                });
+
             modelBuilder.Entity("Minitwit.Models.Entity.Latest", b =>
                 {
                     b.Property<int>("Id")
@@ -175,6 +192,8 @@ namespace Minitwit.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreationTime", "Value");
 
                     b.ToTable("Latest");
                 });
@@ -202,7 +221,13 @@ namespace Minitwit.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("PublishDate");
+
+                    b.HasIndex("AuthorId", "PublishDate");
+
+                    b.HasIndex("Flagged", "PublishDate");
+
+                    b.HasIndex("Flagged", "AuthorId", "PublishDate");
 
                     b.ToTable("Posts");
                 });
@@ -277,21 +302,6 @@ namespace Minitwit.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("UserUser", b =>
-                {
-                    b.Property<int>("FollowedById")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FollowsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("FollowedById", "FollowsId");
-
-                    b.HasIndex("FollowsId");
-
-                    b.ToTable("UserUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -343,6 +353,25 @@ namespace Minitwit.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Minitwit.Models.Entity.Follow", b =>
+                {
+                    b.HasOne("Minitwit.Models.Entity.User", "Followee")
+                        .WithMany("FollowedBy")
+                        .HasForeignKey("FolloweeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Minitwit.Models.Entity.User", "Follower")
+                        .WithMany("Follows")
+                        .HasForeignKey("FollowerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Followee");
+
+                    b.Navigation("Follower");
+                });
+
             modelBuilder.Entity("Minitwit.Models.Entity.Message", b =>
                 {
                     b.HasOne("Minitwit.Models.Entity.User", "Author")
@@ -354,23 +383,12 @@ namespace Minitwit.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("UserUser", b =>
-                {
-                    b.HasOne("Minitwit.Models.Entity.User", null)
-                        .WithMany()
-                        .HasForeignKey("FollowedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Minitwit.Models.Entity.User", null)
-                        .WithMany()
-                        .HasForeignKey("FollowsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Minitwit.Models.Entity.User", b =>
                 {
+                    b.Navigation("FollowedBy");
+
+                    b.Navigation("Follows");
+
                     b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
