@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Minitwit.DatabaseUtil;
+using Minitwit.Models;
 using Minitwit.Models.Context;
+using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 using Minitwit.Services;
 
@@ -12,11 +15,13 @@ namespace Minitwit.Controllers
     public class MinitwitController : Controller
     {
         private readonly MinitwitContext _context;
+        private readonly IOptions<AppsettingsConfig> config;
         private const int PER_PAGE = 30;
 
-        public MinitwitController(MinitwitContext context)
+        public MinitwitController(MinitwitContext context, IOptions<AppsettingsConfig> config)
         {
             _context = context;
+            this.config = config;
         }
 
 
@@ -155,7 +160,7 @@ namespace Minitwit.Controllers
 
         [HttpPost]
         [Route("[controller]/PostMessage")]
-        public async Task<IActionResult> PostMessage([FromBody] string text)
+        public async Task<IActionResult> PostMessage(MessageCreationDTO message)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return RedirectToAction("login", "Users");
@@ -165,7 +170,7 @@ namespace Minitwit.Controllers
             Message newMessage = new Message()
             {
                 AuthorId = int.Parse(userId),
-                Text = text,
+                Text = message.Text,
                 PublishDate = DateTime.UtcNow
             };
 
@@ -173,6 +178,28 @@ namespace Minitwit.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Public_Timeline), "Minitwit");
+        }
+
+        [HttpPost]
+        [Route("[controller]/FlagMessage")]
+        [AllowAnonymous]
+        public async Task<IActionResult> FlagMessage([FromBody] FlagMessageDTO flagDTO)
+        {
+
+            if (!ModelState.IsValid) return BadRequest(flagDTO);
+            if (!IsRequestFromModerator()) return Unauthorized();
+
+            var message = await _context.Posts.FirstOrDefaultAsync(m => m.Id == flagDTO.MessageId);
+            if (message == null) return NotFound(flagDTO.MessageId);
+            message.Flagged = flagDTO.Flagged;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        private bool IsRequestFromModerator()
+        {
+            return Request.Headers["Authorization"].Equals($"Basic {config.Value.ModeratorAPIKey}");
         }
     }
 }
