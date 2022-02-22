@@ -1,0 +1,16 @@
+﻿@using Minitwit.Models.Entity
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@model Message
+@{
+    ViewData["Title"] = "Timeline";
+    var messages = ViewData["Messages"] as List<Message>;
+}
+<h2>@ViewData["Title"]</h2>
+<div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @await Html.PartialAsync("_TwitBox");
+    }
+    @await Html.PartialAsync("_Posts",messages)
+</div>

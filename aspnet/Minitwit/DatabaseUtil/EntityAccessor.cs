@@ -18,11 +18,10 @@ namespace Minitwit.DatabaseUtil
         {
             return _context.Posts.Where(m => m.Author.Id == id && !m.Flagged).ToList();
         }
-        
-        // TODO: This might not be the most optimal way of getting just a user, maybe split into two methods?
+
         public async Task<User?> GetUserByUsername(string username)
         {
-            return await _context.Users.Include(u => u.Follows).FirstOrDefaultAsync(u => u.UserName == username);
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
         public async Task<User?> GetUserById(int id)

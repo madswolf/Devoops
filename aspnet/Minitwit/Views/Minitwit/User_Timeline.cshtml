@@ -1,0 +1,45 @@
+﻿@using Minitwit.Models.Entity
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@model Message
+@{
+    ViewData["Title"] = ViewData["ViewedUserName"] + "'s Timeline";
+    var messages = ViewData["Messages"] as List<Message>;
+}
+<h2>@ViewData["Title"]</h2>
+@if (User?.Identity?.Name != null)
+{
+    @if (User.Identity.Name.Equals(ViewData["ViewedUserName"]))
+    {
+        <div>
+            This is you!
+        </div>
+    }
+    else
+    {
+        <div class="followstatus">
+            @if ((bool)ViewData["IsFollowing"])
+            {
+                <span>
+                    You are currently following this user
+                    <a asp-controller="Minitwit" asp-action="UnFollow" asp-route-username="@ViewData["ViewedUserName"]">
+                        Unfollow this user.
+                    </a>
+                </span>
+            }
+            else
+            {
+                <span>
+                    You are not yet following this user.
+                    <a asp-controller="Minitwit" asp-action="Follow" asp-route-username="@ViewData["ViewedUserName"]">
+                        Follow this user.
+                    </a>
+                </span>
+            }
+        </div>
+    }
+
+}
+<div>
+    @await Html.PartialAsync("_Posts",messages)
+</div>
