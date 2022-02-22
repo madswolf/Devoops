@@ -1,49 +1,54 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Minitwit.Models.Entity
+@inject SignInManager<User> SignInManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Minitwit</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Minitwit.styles.css" asp-append-version="true" />
+    <base href="~/" />
+    <title>@ViewData["Title"] @("|") MiniTwit</title>
+    <link rel=stylesheet type=text/css href="css/style.css">
+    <title>Welcome | MiniTwit</title>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Minitwit" asp-action="Index">Minitwit</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Minitwit" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Minitwit" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2022 - Minitwit - <a asp-area="" asp-controller="Minitwit" asp-action="Privacy">Privacy</a>
+<body>
+<div class="page">
+    <h1>MiniTwit</h1>
+    @if (SignInManager.IsSignedIn(User))
+            {
+                <div class=navigation>
+                    <a class="link" asp-controller="Minitwit" asp-action="Private_Timeline" a>my timeline</a> |
+                    <a class="link" asp-controller="Minitwit" asp-action="Public_Timeline" a>public timeline</a> |
+                    <a class="link" asp-controller="Users" asp-action="Logout" a>sign out[@User.Identity.Name]</a> 
+                </div>
+            }
+            else
+            {
+                <div class="navigation">
+                    <a class="link" asp-controller="Minitwit" asp-action="Public_Timeline" a>public timeline</a> |
+                    <a class="link" asp-controller="Users" asp-action="Register" class="link">sign up</a> |
+                    <a class="link" asp-controller="Users" asp-action="Login">sign in</a>
+                </div>
+            }
+
+        @if (ViewData["flashes"] is not null)
+        {
+            <ul class=flashes>
+                @foreach (var message in (IEnumerable<string>) ViewData["flashes"])
+                {
+                    <li> @message </li>
+                }
+            </ul>
+        }
+
+        <div class=body>
+            @RenderBody()
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    <div class=footer>
+        MiniTwit; A Asp.net Application
+    </div>
+    </div>
 </body>
 </html>

@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Minitwit.Models.Entity
+@model Minitwit.Models.DTO.UserRegistrationDTO
+@inject SignInManager<User> SignInManager
+
+@{
+    ViewData["Title"] = "Sign Up";
+}
+
+<h2>@ViewData["Title"]</h2>
+<form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+    <ul asp-validation-summary="All" class="flashes"></ul>
+    <dt>Username:
+    <dd><input asp-for="username" class="form-control" required autofocus/></dd>
+    <span asp-validation-for="username" class="text-danger"></span>
+    <dt>E-Mail:
+    <dd><input asp-for="email" class="form-control" required/></dd>
+    <span asp-validation-for="email" class="text-danger"></span>
+    <dt>Password:
+    <dd><input asp-for="pwd" class="form-control" required/></dd>
+    <span asp-validation-for="pwd" class="text-danger"></span>
+    <dt>Password <small>(repeat)</small>:
+    <dd><input asp-for="pwdrepeat" class="form-control" required/></dd>
+    <span asp-validation-for="pwdrepeat" class="text-danger"></span>
+    <div class="checkbox">
+        <label asp-for="rememberMe">
+            <input asp-for="rememberMe"/>
+            @Html.DisplayNameFor(m => m.rememberMe)
+        </label>
+        </div>
+    <div class="form-group">
+        <input type="submit" value="Log in"/>
+    </div>
+</form>
