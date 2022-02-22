@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
     config.vm.box = 'digital_ocean'
     config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
     config.ssh.private_key_path = './id_rsa'
-    SSH_KEY_NAME = "Nico Laptop"
+    SSH_KEY_NAME = "nico"
     DIGITAL_OCEAN_TOKEN = "key"
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
   
@@ -47,17 +47,6 @@ Vagrant.configure("2") do |config|
     
     
       server.vm.provision "shell", inline: <<-SHELL
-        echo "Installing Anaconda..."
-        sudo wget https://repo.anaconda.com/archive/Anaconda3-2019.07-Linux-x86_64.sh -O $HOME/Anaconda3-2019.07-Linux-x86_64.sh
-    
-        bash ~/Anaconda3-2019.07-Linux-x86_64.sh -b
-        
-        echo ". $HOME/.bashrc" >> $HOME/.bash_profile
-        echo "export PATH=$HOME/anaconda3/bin:$PATH" >> $HOME/.bash_profile
-        export PATH="$HOME/anaconda3/bin:$PATH"
-        rm Anaconda3-2019.07-Linux-x86_64.sh
-        source $HOME/.bash_profile
-
         cp -r /vagrant/* $HOME
         cd Minitwit
         nohup dotnet run > out.log &
@@ -66,7 +55,7 @@ Vagrant.configure("2") do |config|
         echo "================================================================="
         echo "Navigate in your browser to:"
         THIS_IP=`hostname -I | cut -d" " -f1`
-        echo "http://${THIS_IP}:7077"
+        echo "http://${THIS_IP}:5077"
       SHELL
     end
 
