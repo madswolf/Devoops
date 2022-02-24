@@ -9,13 +9,7 @@ on:
   push:
     branches: [ 'feature/**' ]
 
-jobs:
-  workdir:
-    runs-on: ubuntu-latest
-    steps:
-    - name: working directory
-      run: ls
-      
+jobs: 
   build:
     runs-on: ubuntu-latest
 
