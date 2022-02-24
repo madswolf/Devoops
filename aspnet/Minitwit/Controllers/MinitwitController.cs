@@ -15,13 +15,15 @@ namespace Minitwit.Controllers
     public class MinitwitController : Controller
     {
         private readonly MinitwitContext _context;
+        private IEntityAccessor _entityAccessor;
         private readonly IOptions<AppsettingsConfig> config;
         private const int PER_PAGE = 30;
 
-        public MinitwitController(MinitwitContext context, IOptions<AppsettingsConfig> config)
+        public MinitwitController(MinitwitContext context, IOptions<AppsettingsConfig> config, IEntityAccessor entityAccessor)
         {
             _context = context;
             this.config = config;
+            _entityAccessor = entityAccessor;
         }
 
 
@@ -74,17 +76,16 @@ namespace Minitwit.Controllers
         [Route("[controller]/{username}")]
         public async Task<IActionResult> User_Timeline(string username)
         {
-            var user = await _context.Users
-                .Where(u => u.UserName == username)
-                .FirstOrDefaultAsync();
+            var user = await _entityAccessor.GetUserByUsername(username);
             if (user == null) return NotFound($"UserName with name {username} not found");
 
             var posts = await _context.Users
                 .Include(u => u.Messages)
-                .Where(u => u.UserName == username)
+                .Where(u => u.Id == user.Id)
                 .SelectMany(u => 
                              u.Messages
                             .OrderByDescending(p => p.PublishDate)
+                            .Where(p => !p.Flagged)
                             .Take(PER_PAGE)
                 )
                 .ToListAsync();

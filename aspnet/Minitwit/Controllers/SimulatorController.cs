@@ -18,16 +18,14 @@ namespace Minitwit.Controllers
         private readonly MinitwitContext _context;
         private readonly IEntityAccessor _entityAccessor;
 
-        private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
-        public SimulatorController(MinitwitContext context, IEntityAccessor entityAccessor, SignInManager<User> signInManager, UserManager<User> userManager)
+        public SimulatorController(MinitwitContext context, IEntityAccessor entityAccessor, UserManager<User> userManager)
         {
             _context = context;
             _entityAccessor = entityAccessor;
-            _signInManager = signInManager;
             _userManager = userManager;
         }
 
@@ -61,12 +59,10 @@ namespace Minitwit.Controllers
                 Email = userDTO.email
             };
 
-            if (_context.Users.Any(u => u.UserName == user.UserName))
-                return StatusCode(400);
-
             var result = await _userManager.CreateAsync(user, userDTO.pwd);
+            
+            if (result.Errors.FirstOrDefault(e => e.Code == "DuplicateUserName") != null) return StatusCode(400);
             if (!result.Succeeded) return BadRequest(result);
-            await _signInManager.SignInAsync(user, false);
             return StatusCode(204);
         }
 
@@ -216,10 +212,9 @@ namespace Minitwit.Controllers
                     FollowerId = follower.Id,
                     FolloweeId = unFollowee.Id
                 });
-            }
+            } 
+            await _context.SaveChangesAsync();
 
-
-            var result = await _context.SaveChangesAsync();
             return StatusCode(204);
         }
         private bool IsRequestFromSimulator()
