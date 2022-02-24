@@ -10,17 +10,17 @@ on:
     branches: [ 'feature/**' ]
 
 jobs:
+  workdir:
+    runs-on: ubuntu-latest
+    steps:
+    - name: working directory
+      run: "ls"
+      
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name : machine echo $HOME
-      run : "echo $HOME"
-    - name : machine ls $HOME
-      working-directory : "."
-      run : "ls -la $HOME"
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
