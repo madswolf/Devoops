@@ -3,7 +3,7 @@ name: .NET
 defaults:
   run:
     shell: bash
-    working-directory: aspnet/
+    working-directory: aspnet/Minitwit/
     
 on:
   push:
