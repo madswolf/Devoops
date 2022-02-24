@@ -5,7 +5,8 @@ on:
     branches: [ 'feature/**' ]
 defaults:
   run:
-    working-directory: ./aspnet/Minitwit
+    shell: bash
+    working-directory: Devoops/aspnet/Minitwit
 jobs:
   build:
 
@@ -22,5 +23,5 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      working-directory: ./aspnet/Minitwit.Test
+      working-directory: Devoops/aspnet/Minitwit.Test
       run: dotnet test --verbosity normal
