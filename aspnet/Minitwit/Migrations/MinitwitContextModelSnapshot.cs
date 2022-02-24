@@ -168,6 +168,8 @@ namespace Minitwit.Migrations
 
                     b.HasKey("FollowerId", "FolloweeId");
 
+                    b.HasIndex("FolloweeId");
+
                     b.HasIndex("FolloweeId", "FollowerId");
 
                     b.HasIndex("FollowerId", "FolloweeId");
