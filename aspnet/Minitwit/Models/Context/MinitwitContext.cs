@@ -40,6 +40,7 @@ namespace Minitwit.Models.Context
                 .WithMany(u => u.FollowedBy)
                 .HasForeignKey(f => f.FolloweeId);
 
+            modelBuilder.Entity<Follow>().HasIndex(f => f.FolloweeId);
             modelBuilder.Entity<Follow>().HasIndex(f => new { f.FolloweeId, f.FollowerId });
             modelBuilder.Entity<Follow>().HasIndex(f => new { f.FollowerId, f.FolloweeId });
 
