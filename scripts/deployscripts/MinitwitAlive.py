@@ -2,6 +2,11 @@ import requests
 import time
 import sys
 
+"""
+sys arg1: name of droplet to check alive status of
+sys arg2: digitalocean token
+"""
+
 digitalocean_getdroplets_url = "https://api.digitalocean.com/v2/droplets"
 digitalocean_droplet_name = sys.argv[1]
 digitalocean_getdroplets_headers = {"Authorization": "Bearer " + sys.argv[2]}
@@ -11,7 +16,7 @@ json = digitalocean_droplets_response.json()
 
 def get_ip_from_name(name):
     for i in range(len(json["droplets"])):
-        if json["droplets"][i]["name"] == digitalocean_droplet_name:
+        if json["droplets"][i]["name"] == name:
             return list(filter(lambda e: e["type"] == "public", json["droplets"][i]["networks"]["v4"]))[0]["ip_address"]
     raise "Could not find a droplet with the given name: " + digitalocean_droplet_name
 
