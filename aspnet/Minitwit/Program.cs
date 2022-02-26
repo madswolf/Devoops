@@ -18,7 +18,7 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
     .AddEntityFrameworkStores<MinitwitContext>();
 
 builder.Services.AddDbContext<MinitwitContext>(
-    optionsAction: options => { options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit")); });
+    optionsAction: options => { options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")); });
 
 builder.Services.Configure<AppsettingsConfig>(builder.Configuration.GetSection("Secrets"));
 
