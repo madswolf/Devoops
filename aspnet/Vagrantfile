@@ -10,11 +10,11 @@ Vagrant.configure("2") do |config|
     config.vm.box = 'digital_ocean'
     config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
     config.ssh.private_key_path = './id_rsa'
-    SSH_KEY_NAME = "nico"
-    DIGITAL_OCEAN_TOKEN = "key"
+    SSH_KEY_NAME = ENV["SSH_KEY_NAME"]
+    DIGITAL_OCEAN_TOKEN = ENV["DIGITAL_OCEAN_TOKEN"]
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
   
-    config.vm.define "webserver", primary: false do |server|
+    config.vm.define ENV["DROPLET_TEMP_NAME"], primary: false do |server|
   
       server.vm.provider :digital_ocean do |provider|
         provider.ssh_key_name = SSH_KEY_NAME
@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
         provider.privatenetworking = true
       end
 
-      server.vm.hostname = "webserver"
+      server.vm.hostname = ENV["DROPLET_TEMP_NAME"]
       #config.vm.network :forwarded_port, guest: 7077, host: 7077
       #config.vm.network :forwarded_port, guest: 5077, host: 5077
       
@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
         echo "================================================================="
         echo "Navigate in your browser to:"
         THIS_IP=`hostname -I | cut -d" " -f1`
-        echo "http://${THIS_IP}:5077"
+        echo "http://${THIS_IP}"
       SHELL
     end
 
