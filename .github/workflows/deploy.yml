@@ -35,12 +35,11 @@ jobs:
           echo making new vm environment file
           echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
           echo deploying droplet
+          export DROPLET_NAME=$DROPLET_TEMP_NAME
           vagrant up
           now=$(date +"%T")
           echo "Current time : $now"
           cd ../scripts/deployscripts/
           chmod +x ReplaceAndDestroyProdIfAlive.sh
           echo Replacing prod if staging droplet is alive
-          now=$(date +"%T")
-          echo "Current time : $now"
           ./ReplaceAndDestroyProdIfAlive.sh $DROPLET_TEMP_NAME $DIGITAL_OCEAN_TOKEN $DROPLET_PROD_NAME
