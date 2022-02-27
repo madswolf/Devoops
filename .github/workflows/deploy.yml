@@ -11,7 +11,7 @@ jobs:
       uses: appleboy/ssh-action@v0.1.4
       with:
         host: ${{secrets.SSH_HOST}}
-        key: ${{secrets.SSH_KEY_PRIVATE}}
+        key: ${{secrets.ACTIONS_SSH_KEY_PRIVATE }}
         username: ${{secrets.SSH_HOST_USERNAME}}
         script: |
           rm -rf Devoops
