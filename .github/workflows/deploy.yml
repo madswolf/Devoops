@@ -11,8 +11,8 @@ jobs:
       uses: appleboy/ssh-action@v0.1.4
       with:
         host: ${{secrets.SSH_HOST}}
-        key: ${{secrets.ACTIONS_SSH_KEY_PRIVATE }}
-        username: ${{secrets.SSH_HOST_USERNAME}}
+        username: ${{ secrets.ACTION_DROPLET_USER }}
+        password: ${{ secrets.ACTION_DROPLET_PASSWORD }}
         script: |
           rm -rf Devoops
           git clone https://github.com/ChadIImus/Devoops.git
