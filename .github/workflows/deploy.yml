@@ -1,0 +1,28 @@
+name: Build & Deploy
+on: 
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy shittytwitter app
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{secrets.SSH_HOST}}
+        key: ${{secrets.SSH_KEY_PRIVATE}}
+        username: ${{secrets.SSH_HOST_USERNAME}}
+        script: |
+          rm -rf Devoops
+          git clone https://github.com/ChadIImus/Devoops.git
+          cd Devoops/aspnet/
+          echo ${{secrets.SSH_KEY_PUBLIC}} > ${{secrets.SSH_KEY_NAME}}".pub"
+          echo ${{secrets.SSH_KEY_PRIVATE}} > ${{secrets.SSH_KEY_NAME}}
+          echo export DATABASE_CONNECTION_STRING=${{secrets.DATABASE_CONNECTION_STRING}}">env.sh
+          cp ${{secrets.SSH_KEY_NAME}} ../scripts/deployscripts/
+          cp ${{secrets.SSH_KEY_NAME}}".pub" ../scripts/deployscripts/
+          vagrant up
+          cd ../scripts/deployscripts/
+          chmod +x ReplaceAndDestroyProdIfAlive.sh
+          ./ReplaceAndDestroyProdIfAlive.sh ${{secrets.DROPLET_TEMP_NAME}} ${{secrets.DIGITAL_OCEAN_TOKEN}} ${{secrets.DROPLET_PROD_NAME}}
