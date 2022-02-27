@@ -7,59 +7,60 @@
 # $ rm db_ip.txt | vagrant up | python store_ip.py
 
 Vagrant.configure("2") do |config|
-    config.vm.box = 'digital_ocean'
-    config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
-    config.ssh.private_key_path = './id_rsa'
-    SSH_KEY_NAME = "nico"
-    DIGITAL_OCEAN_TOKEN = "key"
-    config.vm.synced_folder ".", "/vagrant", type: "rsync"
-  
-    config.vm.define "webserver", primary: false do |server|
-  
-      server.vm.provider :digital_ocean do |provider|
-        provider.ssh_key_name = SSH_KEY_NAME
-        provider.token = DIGITAL_OCEAN_TOKEN
-        provider.image = 'ubuntu-18-04-x64'
-        provider.region = 'fra1'
-        provider.size = 's-1vcpu-1gb'
-        provider.privatenetworking = true
-      end
+  config.vm.box = 'digital_ocean'
+  config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+  config.ssh.private_key_path = "./" + ENV["SSH_KEY_NAME"]
+  SSH_KEY_NAME = ENV["SSH_KEY_NAME"]
+  DIGITAL_OCEAN_TOKEN = ENV["DIGITAL_OCEAN_TOKEN"]
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
 
-      server.vm.hostname = "webserver"
-      #config.vm.network :forwarded_port, guest: 7077, host: 7077
-      #config.vm.network :forwarded_port, guest: 5077, host: 5077
-      
-      config.ssh.shell = %{bash -c 'BASH_ENV=/etc/profile exec bash'}
-      
-      config.vm.provision "shell", inline: <<-SHELL
-        export DEBIAN_FRONTEND=noninteractive
-        export LANGUAGE=en_US.UTF-8
-        export LANG=en_US.UTF-8
-        export LC_ALL=en_US.UTF-8
-        locale-gen en_US.UTF-8
-        dpkg-reconfigure locales
-        wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get install apt-transport-https -y
-        sudo apt-get update -y
-        sudo apt-get install dotnet-sdk-6.0 -y
-      SHELL
-    
-    
-      server.vm.provision "shell", inline: <<-SHELL
-        cp -r /vagrant/* $HOME
-        cd Minitwit
-        nohup dotnet run > out.log &
-        echo "================================================================="
-        echo "=                            DONE                               ="
-        echo "================================================================="
-        echo "Navigate in your browser to:"
-        THIS_IP=`hostname -I | cut -d" " -f1`
-        echo "http://${THIS_IP}:5077"
-      SHELL
+  config.vm.define ENV["DROPLET_TEMP_NAME"], primary: false do |server|
+
+    server.vm.provider :digital_ocean do |provider|
+      provider.ssh_key_name = SSH_KEY_NAME
+      provider.token = DIGITAL_OCEAN_TOKEN
+      provider.image = 'ubuntu-18-04-x64'
+      provider.region = 'fra1'
+      provider.size = 's-1vcpu-1gb'
+      provider.privatenetworking = true
     end
 
-    config.vm.provision "shell", privileged: false, inline: <<-SHELL
-        sudo apt-get update
+    server.vm.hostname = ENV["DROPLET_TEMP_NAME"]
+    #config.vm.network :forwarded_port, guest: 7077, host: 7077
+    #config.vm.network :forwarded_port, guest: 5077, host: 5077
+    
+    config.ssh.shell = %{bash -c 'BASH_ENV=/etc/profile exec bash'}
+    
+    config.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
+      export LANGUAGE=en_US.UTF-8
+      export LANG=en_US.UTF-8
+      export LC_ALL=en_US.UTF-8
+      locale-gen en_US.UTF-8
+      dpkg-reconfigure locales
+      wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
+      sudo dpkg -i packages-microsoft-prod.deb
+      sudo apt-get install apt-transport-https -y
+      sudo apt-get update -y
+      sudo apt-get install dotnet-sdk-6.0 -y
     SHELL
-    end
+  
+  
+    server.vm.provision "shell", inline: <<-SHELL
+      cp -r /vagrant/* $HOME
+      . env.sh
+      cd Minitwit
+      nohup dotnet run > out.log &
+      echo "================================================================="
+      echo "=                            DONE                               ="
+      echo "================================================================="
+      echo "Navigate in your browser to:"
+      THIS_IP=`hostname -I | cut -d" " -f1`
+      echo "http://${THIS_IP}"
+    SHELL
+  end
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+      sudo apt-get update
+  SHELL
+end
