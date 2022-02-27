@@ -25,7 +25,7 @@ alive_url = "http://" + get_ip_from_name(digitalocean_droplet_name)
 
 print(alive_url)
 
-for _ in range(60):
+for _ in range(300):
     try:
         res = requests.get(alive_url)
         if res.status_code == 200:
