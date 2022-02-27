@@ -14,20 +14,33 @@ jobs:
         key: ${{secrets.ACTIONS_SSH_KEY_PRIVATE}}
         username: ${{secrets.SSH_HOST_USERNAME}}
         script: |
-          rm -rf Devoops
+          . env.sh
+          rm -rf devoops
+          mkdir devoops
+          cd devoops
+          echo $DATABASE_CONNECTION_STRING > test1
+          echo $DIGITAL_OCEAN_TOKEN > test2
+          echo $DROPLET_PROD_NAME > test3
+          echo $DROPLET_TEMP_NAME > test4
+          echo $SSH_KEY_NAME > test5
+          echo $SSH_KEY_PRIVATE > test6
+          echo $SSH_KEY_PUBLIC > test7
           git clone https://github.com/ChadIImus/Devoops.git
-          cd Devoops/aspnet/
-          echo making keys
-          echo ${{secrets.SSH_KEY_PUBLIC}} > ${{secrets.SSH_KEY_NAME}}".pub"
-          echo ${{secrets.SSH_KEY_PRIVATE}} > ${{secrets.SSH_KEY_NAME}}
-          echo making new vm environment file
-          echo export DATABASE_CONNECTION_STRING=${{secrets.DATABASE_CONNECTION_STRING}}">env.sh
           echo copying keys
-          cp ${{secrets.SSH_KEY_NAME}} ../scripts/deployscripts/
-          cp ${{secrets.SSH_KEY_NAME}}".pub" ../scripts/deployscripts/
-          echo deploying dropley
+          cp ~/$SSH_KEY_NAME".pub" Devoops/aspnet/
+          cp ~/$SSH_KEY_NAME Devoops/aspnet/
+          cp ~/$SSH_KEY_NAME".pub" Devoops/scripts/deployscripts/
+          cp ~/$SSH_KEY_NAME Devoops/scripts/deployscripts/
+          cd Devoops/aspnet/
+          echo making new vm environment file
+          echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
+          echo deploying droplet
           vagrant up
+          now=$(date +"%T")
+          echo "Current time : $now"
           cd ../scripts/deployscripts/
           chmod +x ReplaceAndDestroyProdIfAlive.sh
           echo Replacing prod if staging droplet is alive
-          ./ReplaceAndDestroyProdIfAlive.sh ${{secrets.DROPLET_TEMP_NAME}} ${{secrets.DIGITAL_OCEAN_TOKEN}} ${{secrets.DROPLET_PROD_NAME}}
+          now=$(date +"%T")
+          echo "Current time : $now"
+          ./ReplaceAndDestroyProdIfAlive.sh $DROPLET_TEMP_NAME $DIGITAL_OCEAN_TOKEN $DROPLET_PROD_NAME
