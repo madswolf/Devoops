@@ -17,12 +17,17 @@ jobs:
           rm -rf Devoops
           git clone https://github.com/ChadIImus/Devoops.git
           cd Devoops/aspnet/
+          echo making keys
           echo ${{secrets.SSH_KEY_PUBLIC}} > ${{secrets.SSH_KEY_NAME}}".pub"
           echo ${{secrets.SSH_KEY_PRIVATE}} > ${{secrets.SSH_KEY_NAME}}
+          echo making new vm environment file
           echo export DATABASE_CONNECTION_STRING=${{secrets.DATABASE_CONNECTION_STRING}}">env.sh
+          echo copying keys
           cp ${{secrets.SSH_KEY_NAME}} ../scripts/deployscripts/
           cp ${{secrets.SSH_KEY_NAME}}".pub" ../scripts/deployscripts/
+          echo deploying dropley
           vagrant up
           cd ../scripts/deployscripts/
           chmod +x ReplaceAndDestroyProdIfAlive.sh
+          echo Replacing prod if staging droplet is alive
           ./ReplaceAndDestroyProdIfAlive.sh ${{secrets.DROPLET_TEMP_NAME}} ${{secrets.DIGITAL_OCEAN_TOKEN}} ${{secrets.DROPLET_PROD_NAME}}
