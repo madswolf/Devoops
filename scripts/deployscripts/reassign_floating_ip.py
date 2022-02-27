@@ -1,46 +1,31 @@
-import os
+import requests
 import sys
 
-import requests
+"""
+sys arg1: name of droplet to receive floating ip
+sys arg2: digital ocean token
+"""
 
+digitalocean_floatingips_url = "https://api.digitalocean.com/v2/floating_ips"
+digitalocean_droplets_url = "https://api.digitalocean.com/v2/droplets"
+digitalocean_droplet_name = sys.argv[1]
+headers = {"Authorization": "Bearer " + sys.argv[2]}
 
-def make_authenticated_request(url, payload=None, method="get"):
-    if method == "get":
-        response = requests.get(url, headers={"Authorization": f"Bearer {os.environ.get('DIGITAL_OCEAN_TOKEN')}"})
-    else:
-        response = requests.post(
-            url,
-            data=payload,
-            headers={"Authorization": f"Bearer {os.environ.get('DIGITAL_OCEAN_TOKEN')}"})
-    return response.json()
+digitalocean_floatingip = requests.get(digitalocean_floatingips_url, headers=headers).json()["floating_ips"][0]["ip"]
+digitalocean_droplets = requests.get(digitalocean_droplets_url, headers=headers)
+def get_id_from_name(name, json):
+    for i in range(len(json["droplets"])):
+        if json["droplets"][i]["name"] == name:
+            return json["droplets"][i]["id"]
+    raise Exception("Could not find a droplet with the given name: " + name)
 
+id = get_id_from_name(digitalocean_droplet_name, digitalocean_droplets.json())
 
-def find_new_droplet_id(droplets, new_droplet_name):
-    for droplet in droplets["droplets"]:
-        if droplet["name"] == new_droplet_name:
-            return droplet["id"]
-    return None
+digitalocean_floatingip_assign_url = f"https://api.digitalocean.com/v2/floating_ips/{digitalocean_floatingip}/actions"
+payload = {"type": "assign", "droplet_id": id}
 
-
-'''
-first command line argument is the id of the new machine to assign the floating IP to
-in order to use the script, the DIGITAL_OCEAN_TOKEN has to be set up within enviroment variables
-'''
-if __name__ == '__main__':
-    new_droplet_name = sys.argv[1]
-    droplets = make_authenticated_request("https://api.digitalocean.com/v2/droplets")
-
-    new_droplet_id = find_new_droplet_id(droplets, new_droplet_name)
-    if not new_droplet_id:
-        sys.exit(1)
-
-    # find floating ip to use
-    floating_ip = make_authenticated_request("http://api.digitalocean.com/v2/floating_ips")["floating_ips"][0]["ip"]
-    # assign a floating ip to a new droplet
-    make_authenticated_request(
-        f"http://api.digitalocean.com/v2/floating_ips/{floating_ip}/actions",
-        method="post",
-        payload={
-            "type": "assign",
-            "droplet_id": new_droplet_id
-        })
+update_resp = requests.post(digitalocean_floatingip_assign_url, json=payload, headers=headers)
+if 200 <= update_resp.status_code < 300:
+    exit(0)
+else:
+    exit(1)
