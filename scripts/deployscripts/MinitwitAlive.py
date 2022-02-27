@@ -9,6 +9,7 @@ sys arg2: digitalocean token
 
 digitalocean_getdroplets_url = "https://api.digitalocean.com/v2/droplets"
 digitalocean_droplet_name = sys.argv[1]
+
 digitalocean_getdroplets_headers = {"Authorization": "Bearer " + sys.argv[2]}
 
 digitalocean_droplets_response = requests.get(digitalocean_getdroplets_url, headers=digitalocean_getdroplets_headers)
@@ -18,13 +19,13 @@ def get_ip_from_name(name):
     for i in range(len(json["droplets"])):
         if json["droplets"][i]["name"] == name:
             return list(filter(lambda e: e["type"] == "public", json["droplets"][i]["networks"]["v4"]))[0]["ip_address"]
-    raise "Could not find a droplet with the given name: " + digitalocean_droplet_name
+    raise ValueError("Could not find a droplet with the given name: " + digitalocean_droplet_name)
 
 alive_url = "http://" + get_ip_from_name(digitalocean_droplet_name)
 
 print(alive_url)
 
-for _ in range(10):
+for _ in range(60):
     try:
         res = requests.get(alive_url)
         if res.status_code == 200:
