@@ -9,6 +9,7 @@ namespace Minitwit.Models.DTO
 
         [Required(ErrorMessage = "A password is required")]
         public string pwd { get; set; }
+        [Display(Name = "Remember Me")]
         public bool rememberMe { get; set; }
     }
 }
