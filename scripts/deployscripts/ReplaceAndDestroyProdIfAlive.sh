@@ -26,8 +26,8 @@ else
     echo staging droplet $1 not alive
     now=$(date +"%T")
     echo "Current time : $now"
-    #cd ../../aspnet/
-    #export DROPLET_NAME=$1
-    #vagrant destroy -f
+    cd ../../aspnet/
+    export DROPLET_NAME=$1
+    vagrant destroy -f
     exit 1
 fi
