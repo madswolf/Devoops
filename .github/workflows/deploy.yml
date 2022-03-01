@@ -18,19 +18,10 @@ jobs:
           rm -rf devoops
           mkdir devoops
           cd devoops
-          echo $DATABASE_CONNECTION_STRING > test1
-          echo $DIGITAL_OCEAN_TOKEN > test2
-          echo $DROPLET_PROD_NAME > test3
-          echo $DROPLET_TEMP_NAME > test4
-          echo $SSH_KEY_NAME > test5
-          echo $SSH_KEY_PRIVATE > test6
-          echo $SSH_KEY_PUBLIC > test7
           git clone https://github.com/ChadIImus/Devoops.git
           echo copying keys
           cp ~/$SSH_KEY_NAME".pub" Devoops/aspnet/
           cp ~/$SSH_KEY_NAME Devoops/aspnet/
-          cp ~/$SSH_KEY_NAME".pub" Devoops/scripts/deployscripts/
-          cp ~/$SSH_KEY_NAME Devoops/scripts/deployscripts/
           cd Devoops/aspnet/
           echo making new vm environment file
           echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
