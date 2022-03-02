@@ -1,0 +1,68 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Since the webserver needs the IP of the DB server the two have to be started 
+# in the right order and with storing the IP of the latter on the way:
+#
+# $ rm db_ip.txt | vagrant up | python store_ip.py
+
+Vagrant.configure("2") do |config|
+  config.vm.box = 'digital_ocean'
+  config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+  config.ssh.private_key_path = ""
+  SSH_KEY_NAME = ""
+  DIGITAL_OCEAN_TOKEN = ""
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+  
+  config.vm.define "god", primary: false do |server|
+
+    server.vm.provider :digital_ocean do |provider|
+      provider.ssh_key_name = SSH_KEY_NAME
+      provider.token = DIGITAL_OCEAN_TOKEN
+      provider.image = 'ubuntu-20-04-x64'
+      provider.region = 'fra1'
+      provider.size = 's-1vcpu-1gb'
+      provider.privatenetworking = true
+    end
+
+    server.vm.hostname = "god"
+    #config.vm.network :forwarded_port, guest: 7077, host: 7077
+    #config.vm.network :forwarded_port, guest: 5077, host: 5077
+    
+    config.ssh.shell = %{bash -c 'BASH_ENV=/etc/profile exec bash'}
+    
+    config.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
+      export LANGUAGE=en_US.UTF-8
+      export LANG=en_US.UTF-8
+      export LC_ALL=en_US.UTF-8
+      locale-gen en_US.UTF-8
+      dpkg-reconfigure locales
+      wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
+      sudo dpkg -i packages-microsoft-prod.deb
+      sudo apt-get install apt-transport-https -y
+      sudo apt-get update -y
+    SHELL
+  
+  
+    server.vm.provision "shell", inline: <<-SHELL
+      cp -r /vagrant/* $HOME
+      sudo apt update
+      sudo apt install virtualbox
+      wget -c https://releases.hashicorp.com/vagrant/2.2.19/vagrant_2.2.19_x86_64.deb
+      sudo dpkg -i vagrant_2.2.19_x86_64.deb
+      rm vagrant_2.2.19_x86_64.deb
+      vagrant plugin install vagrant-digitalocean
+      vagrant plugin install vagrant-scp
+      vagrant plugin install vagrant-vbguest
+      vagrant plugin install vagrant-reload
+      echo "================================================================="
+      echo "=                            DONE                               ="
+      echo "================================================================="
+    SHELL
+  end
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+      sudo apt-get update
+  SHELL
+end
