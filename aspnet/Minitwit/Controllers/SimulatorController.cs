@@ -13,16 +13,19 @@ namespace Minitwit.Controllers
     public class SimulatorController : Controller
     {
         private readonly MinitwitContext _context;
-        private readonly IUserRepository _userAccessor;
+        private readonly IUserRepository _userRepository;
+        private readonly IMessageRepository _messageRepository;
 
         private readonly UserManager<User> _userManager;
         
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
-        public SimulatorController(MinitwitContext context, IUserRepository userAccessor, UserManager<User> userManager)
+        public SimulatorController(MinitwitContext context, IUserRepository userRepository, 
+            UserManager<User> userManager, IMessageRepository messageRepository)
         {
             _context = context;
-            _userAccessor = userAccessor;
+            _userRepository = userRepository;
+            _messageRepository = messageRepository;
             _userManager = userManager;
         }
 
@@ -71,17 +74,13 @@ namespace Minitwit.Controllers
             await UpdateLatestAsync();
             if (IsRequestFromSimulator())
             {
-                var filteredMessages = await _context.Posts
-                    .Include(p => p.Author)
-                    .Where(p => !p.Flagged)
-                    .OrderByDescending(p => p.PublishDate)
-                    .Take(limit)
+                var filteredMessages = (await _messageRepository.GetMessages(limit))
                     .Select(p => new
                     {
                         content = p.Text,
                         pub_date = p.PublishDate,
                         user = p.Author.UserName
-                    }).ToListAsync();
+                    }).ToList();
 
                 return Ok(filteredMessages);
             }
@@ -97,18 +96,19 @@ namespace Minitwit.Controllers
             await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
 
-            var filteredMessages = await _context.Posts
-                .Include(p => p.Author)
-                .Where(p => !p.Flagged && p.Author.UserName == username)
-                .OrderByDescending(p => p.PublishDate)
-                .Take(limit)
+            var user = await _userRepository.GetUserByUsername(username);
+            if (user == null)
+            {
+                return NotFound($"User with name {username} not found");
+            }
+
+            var filteredMessages = (await _messageRepository.GetMessagesByAuthorId(user.Id))
                 .Select(p => new
                 {
                     content = p.Text,
                     pub_date = p.PublishDate,
                     user = p.Author.UserName
-                })
-                .ToListAsync();
+                });
 
             return Ok(filteredMessages);
 
@@ -123,20 +123,20 @@ namespace Minitwit.Controllers
             if (!IsRequestFromSimulator()) return Unauthorized();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
-            var user = await _userAccessor.GetUserByUsername(username);
+            var user = await _userRepository.GetUserByUsername(username);
             if (user == null)
             {
                 return NotFound($"User with name {username} not found");
             }
 
             Console.Write("-------------------------------");
-            await _context.Posts.AddAsync(new Message()
+            await _messageRepository.InsertMessage(new Message()
             {
                 Text = messageDTO.content,
                 Author = user,
                 PublishDate = DateTime.UtcNow
             });
-            await _context.SaveChangesAsync();
+
             return StatusCode(204);
 
         }
@@ -148,7 +148,10 @@ namespace Minitwit.Controllers
         {
             await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
-            
+
+            var follower = await _userRepository.GetUserByUsername(username);
+            if (follower == null) return NotFound(username);
+
             var follows = await _context.Users
                 .Include(u => u.Follows)
                 .Where(u => u.UserName == username)
@@ -177,26 +180,22 @@ namespace Minitwit.Controllers
             await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
 
-            var follower = await _userAccessor.GetUserByUsername(username);
+            var follower = await _userRepository.GetUserByUsername(username);
             if (follower == null) return NotFound(username);
             
 
             if (followDTO?.follow != null)
             {
-                var followee = await _userAccessor.GetUserByUsername(followDTO.follow);
+                var followee = await _userRepository.GetUserByUsername(followDTO.follow);
                 if (followee == null) return NotFound(followDTO.follow);
                 var following = _context.Follows.Any(f => f.FolloweeId == followee.Id && f.FollowerId == follower.Id);
                 if (following) return StatusCode(204);
 
-                _context.Follows.Add(new Follow()
-                {
-                    FollowerId = follower.Id,
-                    FolloweeId = followee.Id,
-                });
+                await _userRepository.Follow(follower.Id, followee.Id);
             }
             else if (followDTO?.unfollow != null)
             {
-                var unFollowee = await _userAccessor.GetUserByUsername(followDTO.unfollow);
+                var unFollowee = await _userRepository.GetUserByUsername(followDTO.unfollow);
                 if (unFollowee == null) return NotFound(followDTO.unfollow);
 
                 var following = _context.Follows.Any(f => f.FolloweeId == unFollowee.Id && f.FollowerId == follower.Id);
@@ -204,13 +203,12 @@ namespace Minitwit.Controllers
                     return StatusCode(204);
                 ;
 
-                _context.Follows.Remove(new Follow()
+                await _userRepository.Unfollow(new Follow()
                 {
                     FollowerId = follower.Id,
                     FolloweeId = unFollowee.Id
                 });
-            } 
-            await _context.SaveChangesAsync();
+            }
 
             return StatusCode(204);
         }

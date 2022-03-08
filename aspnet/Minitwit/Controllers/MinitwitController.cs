@@ -34,7 +34,7 @@ namespace Minitwit.Controllers
             if (userStringId == null) return RedirectToAction(nameof(Public_Timeline));
             var userId = int.Parse(userStringId);
 
-            var follows = await _userRepository.GetUserFollows(userId);
+            var follows = (await _userRepository.GetUserFollows(userId)).Select(f => f.FolloweeId).ToList();
 
             var posts = await _messageRepository.GetPrivateTimeline(userId, follows);
 
