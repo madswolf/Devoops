@@ -12,9 +12,9 @@ namespace Minitwit.DatabaseUtil
 
         public void InsertUser(User user);
 
-        public Task<List<int>?> GetUserFollows(int id);
+        public Task<List<Follow>?> GetUserFollows(int id);
 
-        public Task<List<int>?> GetUserFollowedBy(int id);
+        public Task<List<Follow>?> GetUserFollowedBy(int id);
 
         public Task<Follow?> GetFollow(int followerId, int followeeId);
 
