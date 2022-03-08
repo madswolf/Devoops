@@ -17,7 +17,7 @@ namespace Minitwit.Controllers
         private readonly MinitwitContext _context;
         private IEntityAccessor _entityAccessor;
         private readonly IOptions<AppsettingsConfig> config;
-        private const int PER_PAGE = 30;
+        private const int PER_PAGE = 30; // test
 
         public MinitwitController(MinitwitContext context, IOptions<AppsettingsConfig> config, IEntityAccessor entityAccessor)
         {
