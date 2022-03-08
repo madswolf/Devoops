@@ -1,14 +1,11 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using Minitwit.DatabaseUtil;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
-using Minitwit.Services;
 using static System.Int32;
 
 namespace Minitwit.Controllers
@@ -16,16 +13,16 @@ namespace Minitwit.Controllers
     public class SimulatorController : Controller
     {
         private readonly MinitwitContext _context;
-        private readonly IEntityAccessor _entityAccessor;
+        private readonly IUserRepository _userAccessor;
 
         private readonly UserManager<User> _userManager;
         
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
-        public SimulatorController(MinitwitContext context, IEntityAccessor entityAccessor, UserManager<User> userManager)
+        public SimulatorController(MinitwitContext context, IUserRepository userAccessor, UserManager<User> userManager)
         {
             _context = context;
-            _entityAccessor = entityAccessor;
+            _userAccessor = userAccessor;
             _userManager = userManager;
         }
 
@@ -126,7 +123,7 @@ namespace Minitwit.Controllers
             if (!IsRequestFromSimulator()) return Unauthorized();
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
-            var user = await _entityAccessor.GetUserByUsername(username);
+            var user = await _userAccessor.GetUserByUsername(username);
             if (user == null)
             {
                 return NotFound($"User with name {username} not found");
@@ -180,13 +177,13 @@ namespace Minitwit.Controllers
             await UpdateLatestAsync();
             if (!IsRequestFromSimulator()) return Unauthorized();
 
-            var follower = await _entityAccessor.GetUserByUsername(username);
+            var follower = await _userAccessor.GetUserByUsername(username);
             if (follower == null) return NotFound(username);
             
 
             if (followDTO?.follow != null)
             {
-                var followee = await _entityAccessor.GetUserByUsername(followDTO.follow);
+                var followee = await _userAccessor.GetUserByUsername(followDTO.follow);
                 if (followee == null) return NotFound(followDTO.follow);
                 var following = _context.Follows.Any(f => f.FolloweeId == followee.Id && f.FollowerId == follower.Id);
                 if (following) return StatusCode(204);
@@ -199,7 +196,7 @@ namespace Minitwit.Controllers
             }
             else if (followDTO?.unfollow != null)
             {
-                var unFollowee = await _entityAccessor.GetUserByUsername(followDTO.unfollow);
+                var unFollowee = await _userAccessor.GetUserByUsername(followDTO.unfollow);
                 if (unFollowee == null) return NotFound(followDTO.unfollow);
 
                 var following = _context.Follows.Any(f => f.FolloweeId == unFollowee.Id && f.FollowerId == follower.Id);
