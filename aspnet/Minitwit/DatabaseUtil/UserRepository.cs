@@ -26,9 +26,9 @@ namespace Minitwit.DatabaseUtil
                 .FirstOrDefaultAsync(u => u.UserName == username);
         }
 
-        public List<User> GetUsers()
+        public async Task<List<User>?> GetUsers()
         {
-            return _context.Users.ToList();
+            return await _context.Users.ToListAsync();
         }
 
         public async void InsertUser(User user)
