@@ -9,12 +9,12 @@
 Vagrant.configure("2") do |config|
   config.vm.box = 'digital_ocean'
   config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
-  config.ssh.private_key_path = ""
-  SSH_KEY_NAME = ""
-  DIGITAL_OCEAN_TOKEN = ""
+  config.ssh.private_key_path = "./main"
+  SSH_KEY_NAME = "main"
+  DIGITAL_OCEAN_TOKEN = ENV["DIGITAL_OCEAN_TOKEN"]
   config.vm.synced_folder ".", "/vagrant", type: "rsync"
   
-  config.vm.define "god", primary: false do |server|
+  config.vm.define "shittytwitterdeployer", primary: false do |server|
 
     server.vm.provider :digital_ocean do |provider|
       provider.ssh_key_name = SSH_KEY_NAME
@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
       provider.privatenetworking = true
     end
 
-    server.vm.hostname = "god"
+    server.vm.hostname = "shittytwitterdeployer"
     #config.vm.network :forwarded_port, guest: 7077, host: 7077
     #config.vm.network :forwarded_port, guest: 5077, host: 5077
     
@@ -47,8 +47,8 @@ Vagrant.configure("2") do |config|
   
     server.vm.provision "shell", inline: <<-SHELL
       cp -r /vagrant/* $HOME
-      sudo apt update
-      sudo apt install virtualbox
+      sudo apt -y update
+      sudo apt -y install virtualbox
       wget -c https://releases.hashicorp.com/vagrant/2.2.19/vagrant_2.2.19_x86_64.deb
       sudo dpkg -i vagrant_2.2.19_x86_64.deb
       rm vagrant_2.2.19_x86_64.deb
