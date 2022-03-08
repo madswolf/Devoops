@@ -3,7 +3,7 @@ name: "pre-release"
 on:
   push:
     branches:
-      - "test"
+      - "master"
 
 jobs:
   pre-release:
