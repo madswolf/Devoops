@@ -9,5 +9,3 @@ docker-compose build
 ```commandline
 docker-compose up aspnet
 ```
-
-Filler commit
