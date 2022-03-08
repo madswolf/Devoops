@@ -37,21 +37,21 @@ namespace Minitwit.DatabaseUtil
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<int>?> GetUserFollows(int id)
+        public async Task<List<Follow>?> GetUserFollows(int id)
         {
             return await _context.Users
                 .Include(u => u.Follows)
                 .Where(u => u.Id == id)
-                .SelectMany(u => u.Follows.Select(f => f.FolloweeId))
+                .SelectMany(u => u.Follows)
                 .ToListAsync();
         }
 
-        public async Task<List<int>?> GetUserFollowedBy(int id)
+        public async Task<List<Follow>?> GetUserFollowedBy(int id)
         {
             return await _context.Users
                 .Include(u => u.FollowedBy)
                 .Where(u => u.Id == id)
-                .SelectMany(u => u.FollowedBy.Select(f => f.FollowerId))
+                .SelectMany(u => u.FollowedBy)
                 .ToListAsync();
         }
         
