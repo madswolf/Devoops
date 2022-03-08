@@ -13,17 +13,16 @@ namespace Minitwit.Controllers
 {
     public class MinitwitController : Controller
     {
-        private readonly MinitwitContext _context;
-        private readonly IUserRepository _userAccessor;
+        private readonly IUserRepository _userRepository;
+        private readonly IMessageRepository _messageRepository;
         private readonly IOptions<AppsettingsConfig> config;
-        private const int PER_PAGE = 30;
 
-        public MinitwitController(MinitwitContext context, IOptions<AppsettingsConfig> config, IEntityAccessor entityAccessor,
-            IUserRepository userAccessor)
+        public MinitwitController(MinitwitContext context, IOptions<AppsettingsConfig> config,
+            IUserRepository userRepository, IMessageRepository messageRepository)
         {
-            _context = context;
             this.config = config;
-            _userAccessor = userAccessor;
+            _userRepository = userRepository;
+            _messageRepository = messageRepository;
         }
 
 
@@ -35,18 +34,9 @@ namespace Minitwit.Controllers
             if (userStringId == null) return RedirectToAction(nameof(Public_Timeline));
             var userId = int.Parse(userStringId);
 
-            var follows = await _userAccessor.GetUserFollows(userId);
+            var follows = await _userRepository.GetUserFollows(userId);
 
-            var posts = await _context.Posts
-                .Include(p => p.Author)
-                .Where(p => !p.Flagged)
-                .Where(p => 
-                    follows.Contains(p.AuthorId)
-                    || p.AuthorId == userId
-                    )                            
-                .OrderByDescending(p => p.PublishDate)
-                .Take(PER_PAGE)
-                .ToListAsync();
+            var posts = await _messageRepository.GetPrivateTimeline(userId, follows);
 
             ViewData["Messages"] = posts;
             return View();
@@ -57,12 +47,7 @@ namespace Minitwit.Controllers
         public async Task<IActionResult> Public_Timeline()
         {
 
-            var posts = await _context.Posts
-                .Include(p => p.Author)
-                .Where(p => !p.Flagged)
-                .OrderByDescending(p => p.PublishDate)
-                .Take(PER_PAGE)
-                .ToListAsync();
+            var posts = await _messageRepository.GetMessages();
 
             ViewData["Messages"] = posts;
             return View();
@@ -72,26 +57,16 @@ namespace Minitwit.Controllers
         [Route("[controller]/{username}")]
         public async Task<IActionResult> User_Timeline(string username)
         {
-            var user = await _userAccessor.GetUserByUsername(username);
+            var user = await _userRepository.GetUserByUsername(username);
             if (user == null) return NotFound($"UserName with name {username} not found");
 
-            var posts = await _context.Users
-                .Include(u => u.Messages)
-                .Where(u => u.Id == user.Id)
-                .SelectMany(u => 
-                             u.Messages
-                            .OrderByDescending(p => p.PublishDate)
-                            .Where(p => !p.Flagged)
-                            .Take(PER_PAGE)
-                )
-                .ToListAsync();
+            var posts = await _messageRepository.GetMessagesByAuthorId(user.Id);
 
             var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userStringId != null)
             {
                 var loggedInUserId = int.Parse(userStringId);
-                var IsFollowing = _context.Follows.Contains(new Follow
-                    { FolloweeId = user.Id, FollowerId = loggedInUserId });
+                var IsFollowing = (await _userRepository.GetFollow(loggedInUserId, user.Id)) is not null;
                 ViewData["IsFollowing"] = IsFollowing;
             }
 
@@ -109,13 +84,14 @@ namespace Minitwit.Controllers
             if (userStringId == null) return RedirectToAction("login", "Users");
             var userId = int.Parse(userStringId);
 
-            var followee = await _userAccessor.GetUserByUsername(username);
+            var followee = await _userRepository.GetUserByUsername(username);
 
             if (followee == null) return NotFound($"User with name {username} not found");
-            if (_context.Follows.Any(f => f.FolloweeId == followee.Id && f.FollowerId == userId))
+            
+            if ((await _userRepository.GetFollow(userId, followee.Id)) is not null)
                 return Conflict($"User is already following {username}");
             
-            await _userAccessor.Follow(userId, followee.Id);
+            await _userRepository.Follow(userId, followee.Id);
 
             return RedirectToAction(username, "Minitwit");
         }
@@ -129,14 +105,14 @@ namespace Minitwit.Controllers
             if (userStringId == null) return RedirectToAction("login", "Users");
             var userId = int.Parse(userStringId);
 
-            var followee = await _userAccessor.GetUserByUsername(username);
+            var followee = await _userRepository.GetUserByUsername(username);
             if (followee == null) return NotFound($"User with name {username} not found");
 
-            var follow = await _userAccessor.GetFollow(userId, followee.Id);
+            var follow = await _userRepository.GetFollow(userId, followee.Id);
 
             if (follow == null) return NotFound();
 
-            await _userAccessor.Unfollow(follow);
+            await _userRepository.Unfollow(follow);
 
             return RedirectToAction(username, "Minitwit");
         }
@@ -157,8 +133,7 @@ namespace Minitwit.Controllers
                 PublishDate = DateTime.UtcNow
             };
 
-            _context.Posts.Add(newMessage);
-            await _context.SaveChangesAsync();
+            await _messageRepository.InsertMessage(newMessage);
 
             return RedirectToAction(nameof(Public_Timeline), "Minitwit");
         }
@@ -172,10 +147,10 @@ namespace Minitwit.Controllers
             if (!ModelState.IsValid) return BadRequest(flagDTO);
             if (!IsRequestFromModerator()) return Unauthorized();
 
-            var message = await _context.Posts.FirstOrDefaultAsync(m => m.Id == flagDTO.MessageId);
-            if (message == null) return NotFound(flagDTO.MessageId);
-            message.Flagged = flagDTO.Flagged;
-            await _context.SaveChangesAsync();
+            if (await _messageRepository.GetMessage(flagDTO.MessageId) == null)
+                return NotFound(flagDTO.MessageId);
+
+            await _messageRepository.FlagMessage(flagDTO.MessageId, flagDTO.Flagged);
 
             return Ok();
         }

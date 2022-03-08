@@ -8,7 +8,7 @@ namespace Minitwit.DatabaseUtil
 
         public Task<User?> GetUserByUsername(string username);
 
-        public List<User> GetUsers();
+        public Task<List<User>?> GetUsers();
 
         public void InsertUser(User user);
 
