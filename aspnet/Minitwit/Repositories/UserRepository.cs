@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
+using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 
 
@@ -44,6 +45,26 @@ namespace Minitwit.Repositories
                 .Where(u => u.Id == id)
                 .SelectMany(u => u.Follows)
                 .ToListAsync();
+        }
+
+        public async Task<FilteredFollowDTO?> GetFilteredFollows(string username, int limit = 100)
+        {
+            return await _context.Users
+                .Include(u => u.Follows)
+                .Where(u => u.UserName == username)
+                .Select(u => new FilteredFollowDTO
+                {
+                    follows = u.Follows
+                        .Join(
+                            _context.Users,
+                            f => f.FolloweeId,
+                            u => u.Id,
+                            (f, u) => u
+                            )
+                        .Select(u2 => u2.UserName)
+                        .Take(limit)
+                })
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<Follow>?> GetUserFollowedBy(int id)
