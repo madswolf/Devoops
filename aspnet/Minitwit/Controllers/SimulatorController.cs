@@ -180,7 +180,7 @@ namespace Minitwit.Controllers
             {
                 var followee = await _userRepository.GetUserByUsername(followDTO.follow);
                 if (followee == null) return NotFound(followDTO.follow);
-                var following = _context.Follows.Any(f => f.FolloweeId == followee.Id && f.FollowerId == follower.Id);
+                var following = (await _userRepository.GetFollow(follower.Id, followee.Id)) is not null;
                 if (following) return StatusCode(204);
 
                 await _userRepository.Follow(follower.Id, followee.Id);
@@ -190,7 +190,7 @@ namespace Minitwit.Controllers
                 var unFollowee = await _userRepository.GetUserByUsername(followDTO.unfollow);
                 if (unFollowee == null) return NotFound(followDTO.unfollow);
 
-                var following = _context.Follows.Any(f => f.FolloweeId == unFollowee.Id && f.FollowerId == follower.Id);
+                var following = (await _userRepository.GetFollow(follower.Id, unFollowee.Id)) is not null;
                 if (!following)
                     return StatusCode(204);
                 ;
