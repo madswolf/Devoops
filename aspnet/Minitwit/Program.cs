@@ -40,6 +40,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<ILatestRepository, LatestRepository>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
