@@ -100,10 +100,4 @@ app.UseEndpoints(endpoints =>
     endpoints.MapMetrics()
 );
 
-Metrics.DefaultRegistry.AddBeforeCollectCallback(async (cancel) =>
-{
-    var count = thing.Users.Count();
-    UserRepository.totalUsers.IncTo(count);
-});
-
 app.Run();
