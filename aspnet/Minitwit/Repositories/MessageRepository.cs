@@ -49,6 +49,26 @@ namespace Minitwit.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<FilteredMessageDTO>> GetFilteredMessagesByAuthorId(int id, int limit = 100)
+        {
+            return await _context.Users
+                .Include(u => u.Messages)
+                .Where(u => u.Id == id)
+                .SelectMany(u =>
+                             u.Messages
+                            .OrderByDescending(p => p.PublishDate)
+                            .Where(p => !p.Flagged)
+                            .Take(limit)
+                )
+                .Select(p => new FilteredMessageDTO
+                {
+                    Content = p.Text,
+                    PublishDate = p.PublishDate,
+                    AuthorName = p.Author.UserName
+                })
+                .ToListAsync();
+        }
+
         public async Task<List<Message>> GetMessages(int limit = 30)
         {
             return await _context.Posts
