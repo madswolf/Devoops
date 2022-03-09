@@ -12,7 +12,6 @@ namespace Minitwit.Controllers
 {
     public class SimulatorController : Controller
     {
-        private readonly MinitwitContext _context;
         private readonly IUserRepository _userRepository;
         private readonly IMessageRepository _messageRepository;
         private readonly ILatestRepository _latestRepository;
@@ -21,10 +20,9 @@ namespace Minitwit.Controllers
         
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
-        public SimulatorController(MinitwitContext context, IUserRepository userRepository, 
+        public SimulatorController(IUserRepository userRepository, 
             UserManager<User> userManager, IMessageRepository messageRepository, ILatestRepository latestRepository)
         {
-            _context = context;
             _userRepository = userRepository;
             _messageRepository = messageRepository;
             _latestRepository = latestRepository;
@@ -144,22 +142,7 @@ namespace Minitwit.Controllers
             var follower = await _userRepository.GetUserByUsername(username);
             if (follower == null) return NotFound(username);
 
-            var follows = await _context.Users
-                .Include(u => u.Follows)
-                .Where(u => u.UserName == username)
-                .Select(u => new
-                {
-                    follows = u.Follows
-                        .Join(
-                            _context.Users,
-                            f => f.FolloweeId,
-                            u => u.Id,
-                            (f,u) => u
-                            )
-                        .Select(u2 => u2.UserName)
-                        .Take(limit)
-                })
-                .FirstOrDefaultAsync();
+            var follows = await _userRepository.GetFilteredFollows(username);
             
             return Ok(follows);
         }

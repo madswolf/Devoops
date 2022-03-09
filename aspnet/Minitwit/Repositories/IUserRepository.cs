@@ -1,4 +1,5 @@
-﻿using Minitwit.Models.Entity;
+﻿using Minitwit.Models.DTO;
+using Minitwit.Models.Entity;
 
 namespace Minitwit.Repositories
 {
@@ -13,6 +14,8 @@ namespace Minitwit.Repositories
         public void InsertUser(User user);
 
         public Task<List<Follow>?> GetUserFollows(int id);
+
+        public Task<FilteredFollowDTO?> GetFilteredFollows(string username, int limit = 100);
 
         public Task<List<Follow>?> GetUserFollowedBy(int id);
 
