@@ -15,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
-using Minitwit.Services;
 
 namespace Minitwit.Controllers
 {
