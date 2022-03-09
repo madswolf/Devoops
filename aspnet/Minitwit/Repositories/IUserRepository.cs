@@ -1,6 +1,6 @@
 ﻿using Minitwit.Models.Entity;
 
-namespace Minitwit.DatabaseUtil
+namespace Minitwit.Repositories
 {
     public interface IUserRepository
     {

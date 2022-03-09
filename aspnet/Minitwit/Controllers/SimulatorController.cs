@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Minitwit.DatabaseUtil;
+using Minitwit.Repositories;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
@@ -15,17 +15,19 @@ namespace Minitwit.Controllers
         private readonly MinitwitContext _context;
         private readonly IUserRepository _userRepository;
         private readonly IMessageRepository _messageRepository;
+        private readonly ILatestRepository _latestRepository;
 
         private readonly UserManager<User> _userManager;
         
         private const string simulatorAPIToken = "c2ltdWxhdG9yOnN1cGVyX3NhZmUh";
 
         public SimulatorController(MinitwitContext context, IUserRepository userRepository, 
-            UserManager<User> userManager, IMessageRepository messageRepository)
+            UserManager<User> userManager, IMessageRepository messageRepository, ILatestRepository latestRepository)
         {
             _context = context;
             _userRepository = userRepository;
             _messageRepository = messageRepository;
+            _latestRepository = latestRepository;
             _userManager = userManager;
         }
 
@@ -34,14 +36,10 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Latest()
         {
+            
             return Ok(new
             {
-                latest =
-                    await _context.Latest
-                        .OrderByDescending(l => l.CreationTime)
-                        .Select(l => l.Value)
-                        .FirstOrDefaultAsync()
-                    
+                latest = (await _latestRepository.GetLatest()).Value
             });
         }
 
@@ -227,8 +225,7 @@ namespace Minitwit.Controllers
                     Value = Parse(latestString),
                     CreationTime = DateTime.UtcNow
                 };
-                _context.Latest.Add(latest);
-                await _context.SaveChangesAsync();
+                await _latestRepository.InsertLatest(latest);
             }
             // dumb return value to allow for awaiting this function
             return 1;

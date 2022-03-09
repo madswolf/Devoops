@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Minitwit.DatabaseUtil;
+using Minitwit.Repositories;
 using Minitwit.Models;
 using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
