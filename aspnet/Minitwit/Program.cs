@@ -4,6 +4,7 @@ using Minitwit.Repositories;
 using Minitwit.Models;
 using Minitwit.Models.Context;
 using Minitwit.Models.Entity;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,8 +80,8 @@ if (!app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-
 app.UseRouting();
+app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -94,5 +95,15 @@ app.MapRazorPages();
 //Preload data model (to speed up the first few requests)
 var thing = builder.Services.BuildServiceProvider().GetService<MinitwitContext>();
 thing.Follows.FirstOrDefaultAsync();
+
+app.UseEndpoints(endpoints =>
+    endpoints.MapMetrics()
+);
+
+Metrics.DefaultRegistry.AddBeforeCollectCallback(async (cancel) =>
+{
+    var count = thing.Users.Count();
+    UserRepository.totalUsers.IncTo(count);
+});
 
 app.Run();
