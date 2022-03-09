@@ -90,13 +90,7 @@ namespace Minitwit.Controllers
                 return NotFound($"User with name {username} not found");
             }
 
-            var filteredMessages = (await _messageRepository.GetMessagesByAuthorId(user.Id))
-                .Select(p => new
-                {
-                    content = p.Text,
-                    pub_date = p.PublishDate,
-                    user = p.Author.UserName
-                });
+            var filteredMessages = await _messageRepository.GetFilteredMessagesByAuthorId(user.Id);
 
             return Ok(filteredMessages);
 
