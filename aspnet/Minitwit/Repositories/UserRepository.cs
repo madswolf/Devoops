@@ -16,6 +16,7 @@ namespace Minitwit.Repositories
         private static readonly Gauge getUsersTime = Metrics.CreateGauge("getusers_time_s", "Time of GetUsers()");
         private static readonly Gauge insertUserTime = Metrics.CreateGauge("insertuser_time_s", "Time of InsertUser()");
         private static readonly Gauge getUserFollowsTime = Metrics.CreateGauge("getuserfollows_time_s", "Time of GetUserFollows()");
+        private static readonly Gauge getFilteredUserFollowsTime = Metrics.CreateGauge("getfiltereduserfollows_time_s", "Time of GetFilteredUserFollows()");
         private static readonly Gauge getUserFollowedByTime = Metrics.CreateGauge("getuserfollowedby_time_s", "Time of GetUserFollowedBy()");
         private static readonly Gauge getFollowTime = Metrics.CreateGauge("getfollow_time_s", "Time of GetFollow()");
         private static readonly Gauge followTime = Metrics.CreateGauge("follow_time_s", "Time of Follow()");
@@ -76,22 +77,25 @@ namespace Minitwit.Repositories
 
         public async Task<FilteredFollowDTO?> GetFilteredFollows(string username, int limit = 100)
         {
-            return await _context.Users
-                .Include(u => u.Follows)
-                .Where(u => u.UserName == username)
-                .Select(u => new FilteredFollowDTO
-                {
-                    follows = u.Follows
-                        .Join(
-                            _context.Users,
-                            f => f.FolloweeId,
-                            u => u.Id,
-                            (f, u) => u
+            using (getFilteredUserFollowsTime.NewTimer())
+            {
+                return await _context.Users
+                    .Include(u => u.Follows)
+                    .Where(u => u.UserName == username)
+                    .Select(u => new FilteredFollowDTO
+                    {
+                        follows = u.Follows
+                            .Join(
+                                _context.Users,
+                                f => f.FolloweeId,
+                                u => u.Id,
+                                (f, u) => u
                             )
-                        .Select(u2 => u2.UserName)
-                        .Take(limit)
-                })
-                .FirstOrDefaultAsync();
+                            .Select(u2 => u2.UserName)
+                            .Take(limit)
+                    })
+                    .FirstOrDefaultAsync();
+            }
         }
 
         public async Task<List<Follow>?> GetUserFollowedBy(int id)
