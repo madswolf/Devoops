@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Minitwit.Repositories;
-using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 using static System.Int32;
