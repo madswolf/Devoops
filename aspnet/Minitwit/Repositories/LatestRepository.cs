@@ -13,7 +13,7 @@ namespace Minitwit.Repositories
             _context = context;
         }
 
-        public async Task<Latest> GetLatest()
+        public async Task<Latest?> GetLatest()
         {
             return await _context.Latest
                 .OrderByDescending(l => l.CreationTime)
