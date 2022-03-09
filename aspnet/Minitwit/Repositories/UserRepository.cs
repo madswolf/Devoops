@@ -20,7 +20,6 @@ namespace Minitwit.Repositories
         private static readonly Gauge getFollowTime = Metrics.CreateGauge("getfollow_time_s", "Time of GetFollow()");
         private static readonly Gauge followTime = Metrics.CreateGauge("follow_time_s", "Time of Follow()");
         private static readonly Gauge unfollowTime = Metrics.CreateGauge("unfollow_time_s", "Time of Unfollow()");
-        public static readonly Counter totalUsers = Metrics.CreateCounter("totalusers", "Total amount of users registerd");
 
 
         public UserRepository(MinitwitContext context)
