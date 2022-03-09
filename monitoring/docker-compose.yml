@@ -1,6 +1,8 @@
 version: "3"
 
-
+networks:
+  main:
+    external: true
 
 services:
   prometheus:
@@ -21,11 +23,6 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     ports:
       - "3000:3000"
-#    networks:
-#      - main
+    networks:
+      - main
 
-#networks:
-#  main:
-#    external:
-#      name:
-#        main
