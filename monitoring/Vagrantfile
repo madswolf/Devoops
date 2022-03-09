@@ -1,0 +1,58 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = 'digital_ocean'
+  config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+  config.ssh.private_key_path = "~/.ssh/id_rsa"
+  SSH_KEY_NAME = "jsow"
+  DIGITAL_OCEAN_TOKEN = "55445c1127d020e862f447f15b475033bb4622c68e5eb80c8201dd8eccbc06ed"
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
+  config.vm.define "grafana", primary: false do |server|
+
+    server.vm.provider :digital_ocean do |provider|
+      provider.ssh_key_name = SSH_KEY_NAME
+      provider.token = DIGITAL_OCEAN_TOKEN
+      provider.image = 'ubuntu-18-04-x64'
+      provider.region = 'fra1'
+      provider.size = 's-1vcpu-1gb'
+      provider.privatenetworking = true
+    end
+
+    server.vm.hostname = "grafana"
+    
+    config.ssh.shell = %{bash -c 'BASH_ENV=/etc/profile exec bash'}
+    
+    config.vm.provision :docker
+    config.vm.provision :docker_compose, yml: "/vagrant/docker-compose.yml", run: "always"
+    config.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
+      export LANGUAGE=en_US.UTF-8
+      export LANG=en_US.UTF-8
+      export LC_ALL=en_US.UTF-8
+      locale-gen en_US.UTF-8
+      dpkg-reconfigure locales
+      sudo apt-get install apt-transport-https -y
+      sudo apt-get update -y
+      curl -sSL https://repos.insights.digitalocean.com/install.sh | sudo bash
+    SHELL
+  
+  
+    server.vm.provision "shell", inline: <<-SHELL
+      cp -r /vagrant/* $HOME
+#       . env.sh
+#       docker-compose up -d
+      echo "================================================================="
+      echo "=                            DONE                               ="
+      echo "================================================================="
+      echo "Navigate in your browser to:"
+      THIS_IP=`hostname -I | cut -d" " -f1`
+      echo "http://${THIS_IP}"
+    SHELL
+  end
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+      sudo apt-get update
+  SHELL
+end
