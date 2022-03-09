@@ -36,6 +36,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
+    <PackageReference Include="prometheus-net" Version="6.0.0" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
