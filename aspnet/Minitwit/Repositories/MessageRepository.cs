@@ -3,7 +3,7 @@ using Minitwit.Models.Context;
 using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 
-namespace Minitwit.DatabaseUtil
+namespace Minitwit.Repositories
 {
     public class MessageRepository: IMessageRepository
     {
