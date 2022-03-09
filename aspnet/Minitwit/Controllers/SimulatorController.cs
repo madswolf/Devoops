@@ -72,13 +72,7 @@ namespace Minitwit.Controllers
             await UpdateLatestAsync();
             if (IsRequestFromSimulator())
             {
-                var filteredMessages = (await _messageRepository.GetMessages(limit))
-                    .Select(p => new
-                    {
-                        content = p.Text,
-                        pub_date = p.PublishDate,
-                        user = p.Author.UserName
-                    }).ToList();
+                var filteredMessages = await _messageRepository.GetFilteredMessages(limit);
 
                 return Ok(filteredMessages);
             }
