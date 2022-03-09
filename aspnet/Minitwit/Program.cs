@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Minitwit.Controllers;
-using Minitwit.DatabaseUtil;
+using Minitwit.Repositories;
 using Minitwit.Models;
 using Minitwit.Models.Context;
-using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
-using Minitwit.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +38,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-builder.Services.AddScoped<IEntityAccessor, EntityAccessor>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<ILatestRepository, LatestRepository>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
