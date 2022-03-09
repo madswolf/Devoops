@@ -1,0 +1,31 @@
+version: "3"
+
+
+
+services:
+#  prometheus:
+#    image: prom/prometheus
+#    container_name: prometheus
+#    volumes:
+#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#    ports:
+#      - "9090:9090"
+#    networks:
+#      - main
+
+  grafana:
+    image: grafana/grafana:4.5.2
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+#    networks:
+#      - main
+
+#networks:
+#  main:
+#    external:
+#      name:
+#        main
