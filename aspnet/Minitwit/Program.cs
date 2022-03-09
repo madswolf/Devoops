@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Minitwit.DatabaseUtil;
+using Minitwit.Repositories;
 using Minitwit.Models;
 using Minitwit.Models.Context;
 using Minitwit.Models.Entity;

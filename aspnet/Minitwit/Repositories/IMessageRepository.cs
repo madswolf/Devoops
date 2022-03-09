@@ -1,7 +1,7 @@
 ﻿using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
 
-namespace Minitwit.DatabaseUtil
+namespace Minitwit.Repositories
 {
     public interface IMessageRepository
     {
