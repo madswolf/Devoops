@@ -16,4 +16,4 @@ scrape_configs:
     scrape_interval: 5s
 
     static_configs:
-      - targets: ['138.197.182.59']
+      - targets: ['shittytwitter.tk']
