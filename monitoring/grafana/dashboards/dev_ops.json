@@ -273,7 +273,7 @@
       "pluginVersion": "8.4.3",
       "targets": [
         {
-          "expr": "up{instance=\"138.197.182.59:80\"}",
+          "expr": "up{}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -348,7 +348,7 @@
       "pluginVersion": "8.4.3",
       "targets": [
         {
-          "expr": "(time() - process_start_time_seconds{instance=\"138.197.182.59:80\", job=\"prometheus\"})",
+          "expr": "(time() - process_start_time_seconds{job=\"prometheus\"})",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 2,
@@ -410,7 +410,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getuserfollowedby_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getuserfollowedby_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -501,7 +501,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getfilteredmessages_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getfilteredmessages_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -592,7 +592,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getusers_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getusers_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -683,7 +683,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getfollow_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getfollow_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -774,7 +774,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "insertuser_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "insertuser_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -865,7 +865,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getmessagesbyauthor_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getmessagesbyauthor_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -956,7 +956,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "unfollow_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "unfollow_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1047,7 +1047,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getmessages_time_s {instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getmessages_time_s {job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1138,7 +1138,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getuserbyid_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getuserbyid_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1229,7 +1229,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getuserbyusername_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getuserbyusername_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1320,7 +1320,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "insertmessage_time_s {instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "insertmessage_time_s {job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1406,7 +1406,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getprivatetimeline_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getprivatetimeline_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1488,7 +1488,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "flagmessage_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "flagmessage_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1570,7 +1570,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "follow_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "follow_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1652,7 +1652,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getmessage_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getmessage_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1734,7 +1734,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "getuserfollows_time_s{instance=\"138.197.182.59:80\", job=\"prometheus\"}",
+          "expr": "getuserfollows_time_s{job=\"prometheus\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
