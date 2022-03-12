@@ -1,9 +1,9 @@
-FROM grafana/grafana:7.1.5-ubuntu
+FROM grafana/grafana:8.4.3-ubuntu
 
 # Disable Login form or not
-ENV GF_AUTH_DISABLE_LOGIN_FORM "false"
+ENV GF_AUTH_DISABLE_LOGIN_FORM "true"
 # Allow anonymous authentication or not
-ENV GF_AUTH_ANONYMOUS_ENABLED "false"
+ENV GF_AUTH_ANONYMOUS_ENABLED "true"
 # Role of anonymous user
 ENV GF_AUTH_ANONYMOUS_ORG_ROLE "Admin"
 # Install plugins here our in your own config file
@@ -12,6 +12,6 @@ ENV GF_AUTH_ANONYMOUS_ORG_ROLE "Admin"
 # Add provisioning
 ADD ./provisioning /etc/grafana/provisioning
 # Add configuration file
-ADD ./grafana.ini /etc/grafana/grafana.ini
+ADD ./config.ini /etc/grafana/config.ini
 # Add dashboard json files
-ADD ./dashboards /etc/grafana/dashboards
+ADD ./dashboards /var/lib/grafana/dashboards
