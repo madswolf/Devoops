@@ -1,4 +1,7 @@
-name: Example workflow for dotNET using Snyk
+name: Snyk Workflow
+defaults:
+  run:
+    working-directory: aspnet/Minitwit/
 on: 
   pull_request:
     branches: [ master ]
