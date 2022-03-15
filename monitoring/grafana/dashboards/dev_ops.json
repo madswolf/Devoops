@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "iteration": 1647110742157,
+  "iteration": 1647345286932,
   "links": [
     {
       "icon": "info",
@@ -131,9 +131,6 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "uid": "shittytwitter"
-      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -171,8 +168,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "http_request_duration_seconds_sum{action=~\"PostMessage|Private_Timeline|Public_Timeline|Register\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P64524D9794537023"
+          },
+          "exemplar": true,
+          "expr": "http_request_duration_seconds_sum{action=~\"PostMessage|Private_Timeline|Public_Timeline|Register\"}/http_request_duration_seconds_count{action=~\"PostMessage|Private_Timeline|Public_Timeline|Register\"}",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 2,
           "legendFormat": "{{action}}, {{code}}",
           "refId": "A",
@@ -1771,7 +1774,7 @@
       ]
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "revision": "1.0",
   "schemaVersion": 35,
   "style": "dark",
@@ -1781,21 +1784,26 @@
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "isNone": true,
+          "selected": false,
+          "text": "None",
+          "value": ""
+        },
         "datasource": {
           "uid": "shittytwitter"
         },
         "definition": "",
-        "error": {
-          "message": "Datasource shittytwitter was not found"
-        },
         "hide": 0,
         "includeAll": false,
         "label": "HOST:",
         "multi": false,
         "name": "node",
         "options": [],
-        "query": "label_values(prometheus_build_info, instance)",
+        "query": {
+          "query": "label_values(prometheus_build_info, instance)",
+          "refId": "shittytwitter-node-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
