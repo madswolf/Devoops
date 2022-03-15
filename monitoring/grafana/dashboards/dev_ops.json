@@ -45,12 +45,9 @@
   "panels": [
     {
       "aliasColors": {},
-      "bars": false,
+      "bars": true,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "uid": "shittytwitter"
-      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -62,15 +59,17 @@
       "hiddenSeries": false,
       "id": 21,
       "legend": {
-        "avg": false,
-        "current": false,
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
         "max": false,
         "min": false,
+        "rightSide": true,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
-      "lines": true,
+      "lines": false,
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
@@ -84,21 +83,38 @@
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
-      "stack": false,
+      "stack": true,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "http_requests_received_total{action=~\"PostMessage|Private_Timeline|Public_Timeline|Register\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P64524D9794537023"
+          },
+          "exemplar": true,
+          "expr": "increase(http_requests_received_total{action=~\"PostMessage|Private_Timeline|Public_Timeline|Register\"}[1h])",
           "format": "time_series",
-          "intervalFactor": 2,
+          "instant": false,
+          "interval": "1h",
+          "intervalFactor": 1,
           "legendFormat": "{{action}}, {{code}}",
           "refId": "A",
           "step": 600
         }
       ],
       "thresholds": [],
-      "timeRegions": [],
-      "title": "HTTP requests received in total",
+      "timeRegions": [
+        {
+          "$$hashKey": "object:139",
+          "colorMode": "background6",
+          "fill": true,
+          "fillColor": "rgba(234, 112, 112, 0.12)",
+          "line": false,
+          "lineColor": "rgba(237, 46, 24, 0.60)",
+          "op": "time"
+        }
+      ],
+      "title": "HTTP requests per endpoint per hour",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -112,11 +128,13 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:173",
           "format": "short",
           "logBase": 1,
           "show": true
         },
         {
+          "$$hashKey": "object:174",
           "format": "short",
           "logBase": 1,
           "show": true
@@ -1377,6 +1395,7 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1384,6 +1403,7 @@
         "x": 0,
         "y": 32
       },
+      "hiddenSeries": false,
       "id": 30,
       "legend": {
         "avg": false,
@@ -1398,6 +1418,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.3",
       "pointradius": 2,
@@ -1420,6 +1443,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Time of GetPrivateTimeline()",
       "tooltip": {
         "shared": true,
@@ -1443,7 +1467,10 @@
           "logBase": 1,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false
+      }
     },
     {
       "aliasColors": {
@@ -1459,6 +1486,7 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1466,6 +1494,7 @@
         "x": 4,
         "y": 32
       },
+      "hiddenSeries": false,
       "id": 31,
       "legend": {
         "avg": false,
@@ -1480,6 +1509,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.3",
       "pointradius": 2,
@@ -1502,6 +1534,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Time of FlagMessages()",
       "tooltip": {
         "shared": true,
@@ -1525,7 +1558,10 @@
           "logBase": 1,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false
+      }
     },
     {
       "aliasColors": {
@@ -1541,6 +1577,7 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1548,6 +1585,7 @@
         "x": 8,
         "y": 32
       },
+      "hiddenSeries": false,
       "id": 32,
       "legend": {
         "avg": false,
@@ -1562,6 +1600,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.3",
       "pointradius": 2,
@@ -1584,6 +1625,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Time of Follow()",
       "tooltip": {
         "shared": true,
@@ -1607,7 +1649,10 @@
           "logBase": 1,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false
+      }
     },
     {
       "aliasColors": {
@@ -1623,6 +1668,7 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1630,6 +1676,7 @@
         "x": 12,
         "y": 32
       },
+      "hiddenSeries": false,
       "id": 33,
       "legend": {
         "avg": false,
@@ -1644,6 +1691,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.3",
       "pointradius": 2,
@@ -1666,6 +1716,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Time of GetMessage()",
       "tooltip": {
         "shared": true,
@@ -1689,7 +1740,10 @@
           "logBase": 1,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false
+      }
     },
     {
       "aliasColors": {
@@ -1705,6 +1759,7 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
@@ -1712,6 +1767,7 @@
         "x": 16,
         "y": 32
       },
+      "hiddenSeries": false,
       "id": 34,
       "legend": {
         "avg": false,
@@ -1726,6 +1782,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.3",
       "pointradius": 2,
@@ -1748,6 +1807,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Time of GetUserFollows()",
       "tooltip": {
         "shared": true,
@@ -1771,10 +1831,13 @@
           "logBase": 1,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false
+      }
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "revision": "1.0",
   "schemaVersion": 35,
   "style": "dark",
