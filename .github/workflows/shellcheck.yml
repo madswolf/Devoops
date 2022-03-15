@@ -6,6 +6,8 @@ defaults:
 on:
   pull_request:
     branches: [ master ]
+  push:
+    branches: [ feature/shellcheck ]
 
 jobs:
   shellcheck:
