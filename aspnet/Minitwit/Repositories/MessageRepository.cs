@@ -132,11 +132,11 @@ namespace Minitwit.Repositories
             }
         }
 
-        public async Task FlagMessage(int id, bool flagged)
+        public async Task FlagMessage(int messageId, bool flagged)
         {
             using (flagMessageTime.NewTimer())
             {
-                _context.Posts.Where(p => p.Id == id).FirstOrDefault().Flagged = flagged;
+                _context.Posts.Where(p => p.Id == messageId).FirstOrDefault().Flagged = flagged;
                 await _context.SaveChangesAsync();
             }
         }
