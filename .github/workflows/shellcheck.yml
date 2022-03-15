@@ -1,7 +1,4 @@
 name: "Shellcheck"
-defaults:
-  run:
-    working-directory: scripts/deployscripts/
 
 on:
   pull_request:
@@ -18,6 +15,7 @@ jobs:
       - name: shellcheck
         uses: reviewdog/action-shellcheck@v1
         with:
+          scandir: ./scripts/deployscripts
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review # Change reporter.
           path: "." # Optional.
