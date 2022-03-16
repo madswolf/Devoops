@@ -15,5 +15,4 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: chadiimus/devoops/aspnet/minitwit
-          args: --file=Minitwit.csproj
+          args: --file=chadiimus/devoops/aspnet/minitwit/Minitwit.csproj
