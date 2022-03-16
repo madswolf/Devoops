@@ -17,13 +17,14 @@ namespace Minitwit.Repositories
             _context = context;
         }
 
-        public async Task<Latest?> GetLatest()
+        //we can't handle a latest request if none are present... return empty latest
+        public async Task<Latest> GetLatest()
         {
             using (getLatestTime.NewTimer())
             {
                 return await _context.Latest
                     .OrderByDescending(l => l.CreationTime)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync() ?? new Latest();
             }
         }
 
