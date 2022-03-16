@@ -24,16 +24,6 @@ namespace Minitwit.Repositories
             _context = context;
         }
 
-        public async Task<Message> GetMessage(int id)
-        {
-            using (getMessageTime.NewTimer())
-            {
-                return await _context.Posts
-                    .Where(p => p.Id == id)
-                    .FirstOrDefaultAsync();
-            }
-        }
-
         public async Task<List<Message>> GetPrivateTimeline(int id, List<int> follows, int limit = 30)
         {
             using (getPrivateTimelineTime.NewTimer())
@@ -132,12 +122,21 @@ namespace Minitwit.Repositories
             }
         }
 
-        public async Task FlagMessage(int id, bool flagged)
+        public async Task<bool> FlagMessage(int messageId, bool flagged)
         {
             using (flagMessageTime.NewTimer())
             {
-                _context.Posts.Where(p => p.Id == id).FirstOrDefault().Flagged = flagged;
+                Message? message;
+                using (getMessageTime.NewTimer())
+                {
+                     message = await _context.Posts
+                        .FirstOrDefaultAsync(p => p.Id == messageId);
+                }
+                if (message == null) return false;
+
+                message.Flagged = flagged;
                 await _context.SaveChangesAsync();
+                return true;
             }
         }
     }

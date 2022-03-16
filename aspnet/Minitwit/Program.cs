@@ -76,8 +76,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Disabled for testing purposes
-// app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -91,10 +89,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-
-//Preload data model (to speed up the first few requests)
-var thing = builder.Services.BuildServiceProvider().GetService<MinitwitContext>();
-thing.Follows.FirstOrDefaultAsync();
 
 app.UseEndpoints(endpoints =>
     endpoints.MapMetrics()

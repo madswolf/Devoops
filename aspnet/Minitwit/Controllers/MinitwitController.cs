@@ -147,10 +147,8 @@ namespace Minitwit.Controllers
             if (!ModelState.IsValid) return BadRequest(flagDTO);
             if (!IsRequestFromModerator()) return Unauthorized();
 
-            if (await _messageRepository.GetMessage(flagDTO.MessageId) == null)
-                return NotFound(flagDTO.MessageId);
-
-            await _messageRepository.FlagMessage(flagDTO.MessageId, flagDTO.Flagged);
+            var wasFlagged = await _messageRepository.FlagMessage(flagDTO.MessageId, flagDTO.Flagged);
+            if(!wasFlagged) return NotFound(flagDTO.MessageId);
 
             return Ok();
         }
