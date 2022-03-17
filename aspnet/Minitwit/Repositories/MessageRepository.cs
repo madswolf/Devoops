@@ -45,16 +45,7 @@ namespace Minitwit.Repositories
         {
             using (getMessagesByAuthorTime.NewTimer())
             {
-                return await _context.Users
-                    .Include(u => u.Messages)
-                    .Where(u => u.Id == id)
-                    .SelectMany(u =>
-                                 u.Messages
-                                .OrderByDescending(p => p.PublishDate)
-                                .Where(p => !p.Flagged)
-                                .Take(limit)
-                    )
-                    .ToListAsync();
+                return await MessagesByAuthorId(id, limit).ToListAsync();
             }
         }
 
@@ -62,22 +53,9 @@ namespace Minitwit.Repositories
         {
             using (getFilteredMessagesByAuthorTime.NewTimer())
             {
-                return await _context.Users
-                    .Include(u => u.Messages)
-                    .Where(u => u.Id == id)
-                    .SelectMany(u =>
-                        u.Messages
-                            .OrderByDescending(p => p.PublishDate)
-                            .Where(p => !p.Flagged)
-                            .Take(limit)
-                    )
-                    .Select(p => new FilteredMessageDTO
-                    {
-                        Content = p.Text,
-                        PublishDate = p.PublishDate,
-                        AuthorName = p.Author.UserName
-                    })
-                    .ToListAsync();
+                var messages = MessagesByAuthorId(id, limit);
+
+                return await FilteredMessageDtos(messages);
             }
         }
 
@@ -98,18 +76,13 @@ namespace Minitwit.Repositories
         {
             using (getFilteredMessagesTime.NewTimer())
             {
-                return await _context.Posts
+                var messages = _context.Posts
                     .Include(p => p.Author)
                     .Where(p => !p.Flagged)
                     .OrderByDescending(p => p.PublishDate)
-                    .Take(limit)
-                    .Select(p => new FilteredMessageDTO
-                    {
-                        Content = p.Text,
-                        PublishDate = p.PublishDate,
-                        AuthorName = p.Author.UserName
-                    })
-                    .ToListAsync();
+                    .Take(limit);
+
+                return await FilteredMessageDtos(messages);
             }
         }
 
@@ -139,5 +112,30 @@ namespace Minitwit.Repositories
                 return true;
             }
         }
+
+        private IQueryable<Message> MessagesByAuthorId(int id, int limit)
+        {
+            return _context.Users
+                .Include(u => u.Messages)
+                .Where(u => u.Id == id)
+                .SelectMany(u =>
+                    u.Messages
+                        .OrderByDescending(p => p.PublishDate)
+                        .Where(p => !p.Flagged)
+                        .Take(limit)
+                );
+        }
+
+        private static async Task<List<FilteredMessageDTO>> FilteredMessageDtos(IQueryable<Message> messages)
+        {
+            return await messages.Select(p => new FilteredMessageDTO
+                {
+                    Content = p.Text,
+                    PublishDate = p.PublishDate,
+                    AuthorName = p.Author.UserName
+                })
+                .ToListAsync();
+        }
+
     }
 }
