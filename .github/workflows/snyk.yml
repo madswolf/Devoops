@@ -1,7 +1,4 @@
 name: Snyk Workflow
-defaults:
-  run:
-    working-directory: aspnet/Minitwit/
 on: 
   pull_request:
     branches: [ master ]
@@ -15,4 +12,4 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --file=chadiimus/devoops/aspnet/minitwit/Minitwit.csproj
+          args: --file=aspnet/minitwit/Minitwit.csproj
