@@ -7,23 +7,22 @@ datasources:
     is_default: true
     version: 1
     editable: true
-  - name: "defaultdb"
-    org_id: 1
-    type: "postgres"
-    typeName: "PostgreSQL"
-    access: "proxy"
+  - name: defaultdb
+    type: postgres
+    access: proxy
+    version: 1
+    editable: true
     url: "db-postgresql-fra1-40527-do-user-10842035-0.b.db.ondigitalocean.com:25060"
-    password: ""
-    user: "doadmin"
-    database: "defaultdb"
-    basicAuth: false
-    isDefault: false
-    jsonData: 
+    database: defaultdb
+    user: doadmin
+    password: "hYj0D9znk3OpXyIi"
+    secureJsonData:
+      password: hYj0D9znk3OpXyIi
+    sslmode: require
+    jsonData:
+      sslmode: require
+      maxOpenConns: 0
+      maxIdleConns: 2  
+      connMaxLifetime: 14400  
       postgresVersion: 1200
-      sslmode: "require"
-      tlsAuth: true
-      tlsAuthWithCACert: true
-      tlsConfigurationMethod: "file-path"
-      tlsSkipVerify: false
-    readOnly: false
-    
+      timescaledb: false
