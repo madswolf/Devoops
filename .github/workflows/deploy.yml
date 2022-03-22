@@ -1,0 +1,36 @@
+name: Build & Deploy
+on: 
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy shittytwitter app
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{secrets.SSH_HOST}}
+        key: ${{secrets.ACTIONS_SSH_KEY_PRIVATE}}
+        username: ${{secrets.SSH_HOST_USERNAME}}
+        script: |
+          . env.sh
+          rm -rf devoops
+          mkdir devoops
+          cd devoops
+          git clone https://github.com/ChadIImus/Devoops.git
+          echo copying keys
+          cp ~/$SSH_KEY_NAME".pub" Devoops/aspnet/
+          cp ~/$SSH_KEY_NAME Devoops/aspnet/
+          cd Devoops/aspnet/
+          echo making new vm environment file
+          echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
+          echo deploying droplet
+          export DROPLET_NAME=$DROPLET_TEMP_NAME
+          vagrant up
+          now=$(date +"%T")
+          echo "Current time : $now"
+          cd ../scripts/deployscripts/
+          chmod +x ReplaceAndDestroyProdIfAlive.sh
+          echo Replacing prod if staging droplet is alive
+          ./ReplaceAndDestroyProdIfAlive.sh $DROPLET_TEMP_NAME $DIGITAL_OCEAN_TOKEN $DROPLET_PROD_NAME
