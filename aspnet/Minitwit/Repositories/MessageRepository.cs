@@ -26,6 +26,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Message>> GetPrivateTimeline(int id, List<int> follows, int limit = 30)
         {
+            // LOG: Debug: Called GetPrivateTimeline() with arguments {id}, {follows}, {limit}
             using (getPrivateTimelineTime.NewTimer())
             {
                 return await _context.Posts
@@ -43,6 +44,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Message>> GetMessagesByAuthorId(int id, int limit = 30)
         {
+            // LOG: Debug: Called GetMessagesByAuthorId {id} {limit}
             using (getMessagesByAuthorTime.NewTimer())
             {
                 return await _context.Users
@@ -60,6 +62,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<FilteredMessageDTO>> GetFilteredMessagesByAuthorId(int id, int limit = 100)
         {
+            // LOG: Debug: Called GetFilteredMessagesByAuthorId {id} {limit}
             using (getFilteredMessagesByAuthorTime.NewTimer())
             {
                 return await _context.Users
@@ -83,6 +86,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Message>> GetMessages(int limit = 30)
         {
+            // LOG: Debug: Called GetMessages() {limit}
             using (getMessagesTime.NewTimer())
             {
                 return await _context.Posts
@@ -96,6 +100,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<FilteredMessageDTO>> GetFilteredMessages(int limit = 100)
         {
+            // LOG: Debug: GetFilteredMessages() {limit}
             using (getFilteredMessagesTime.NewTimer())
             {
                 return await _context.Posts
@@ -115,6 +120,7 @@ namespace Minitwit.Repositories
 
         public async Task InsertMessage(Message message)
         {
+            // LOG: Debug: Called InsertMessage() {message}
             using (insertMessageTime.NewTimer())
             {
                 _context.Posts.Add(message);
@@ -124,6 +130,7 @@ namespace Minitwit.Repositories
 
         public async Task<bool> FlagMessage(int messageId, bool flagged)
         {
+            // LOG: Debug: Called FlagMessage() {messageId} {flagged}
             using (flagMessageTime.NewTimer())
             {
                 Message? message;

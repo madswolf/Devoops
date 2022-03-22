@@ -15,11 +15,13 @@ namespace Minitwit.Repositories
         public LatestRepository(MinitwitContext context)
         {
             _context = context;
+            // LOG: Debug: Created LatestRepository
         }
 
         //we can't handle a latest request if none are present... return empty latest
         public async Task<Latest> GetLatest()
         {
+            // LOG: Debug: Called GetLatest()
             using (getLatestTime.NewTimer())
             {
                 return await _context.Latest
@@ -30,9 +32,11 @@ namespace Minitwit.Repositories
 
         public async Task InsertLatest(Latest latest)
         {
+            // LOG: Debug: Called InsertLatest()
             using (insertLatestTime.NewTimer())
             {
                 _context.Latest.Add(latest);
+                // LOG: Debug: Added new latest
                 await _context.SaveChangesAsync();
             }
         }
