@@ -16,6 +16,8 @@ namespace Minitwit.Models.DTO
             [Required(ErrorMessage = "The email address is required")]
             [EmailAddress(ErrorMessage = "Invalid Email Address")]
             public string email { get; set; }
+
+            [Display(Name = "Remember Me")]
             public bool rememberMe { get; set; }
     }
 

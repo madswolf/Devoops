@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Minitwit.Controllers;
-using Minitwit.DatabaseUtil;
+using Minitwit.Repositories;
 using Minitwit.Models;
 using Minitwit.Models.Context;
-using Minitwit.Models.DTO;
 using Minitwit.Models.Entity;
-using Minitwit.Services;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +16,13 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
     .AddEntityFrameworkStores<MinitwitContext>();
 
 builder.Services.AddDbContext<MinitwitContext>(
-    optionsAction: options => { options.UseNpgsql(builder.Configuration.GetConnectionString("Minitwit")); });
+    optionsAction: options => {
+        var connstr = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
+        if (connstr != null)
+            options.UseNpgsql(connstr);
+        else
+            options.UseInMemoryDatabase("Test");
+    });
 
 builder.Services.Configure<AppsettingsConfig>(builder.Configuration.GetSection("Secrets"));
 
@@ -35,7 +39,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-builder.Services.AddScoped<IEntityAccessor, EntityAccessor>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<ILatestRepository, LatestRepository>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -70,12 +76,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Disabled for testing purposes
-// app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-
 app.UseRouting();
+app.UseHttpMetrics();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -86,8 +90,8 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-//Preload data model (to speed up the first few requests)
-var thing = builder.Services.BuildServiceProvider().GetService<MinitwitContext>();
-thing.Follows.FirstOrDefaultAsync();
+app.UseEndpoints(endpoints =>
+    endpoints.MapMetrics()
+);
 
 app.Run();
