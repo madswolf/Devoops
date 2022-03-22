@@ -4,9 +4,9 @@ using Minitwit.Models.Entity;
 
 namespace Minitwit.Test.Context
 {
-    public class TestContext : MinitwitContext
+    public class MinitwitTestContext : MinitwitContext
     {
-        public TestContext(DbContextOptions<MinitwitContext> options)
+        public MinitwitTestContext(DbContextOptions<MinitwitContext> options)
             : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,8 +25,8 @@ namespace Minitwit.Test.Context
                 new Message { Id = 2, AuthorId = 2, PublishDate = System.DateTime.Now, Text = "Dead meme", Flagged = false },
                 new Message { Id = 3, AuthorId = 3, PublishDate = System.DateTime.Now.AddDays(-1), Text = "Repost", Flagged = false },
                 new Message { Id = 4, AuthorId = 4, PublishDate = System.DateTime.Now.AddHours(-1), Text = "Actual sensible post", Flagged = false },
-                new Message { Id = 4, AuthorId = 1, PublishDate = System.DateTime.Now, Text = "L + ratio", Flagged = true },
-                new Message { Id = 5, AuthorId = 3, PublishDate = System.DateTime.Now, Text = "Ingefær", Flagged = false }
+                new Message { Id = 5, AuthorId = 1, PublishDate = System.DateTime.Now, Text = "L + ratio", Flagged = true },
+                new Message { Id = 6, AuthorId = 3, PublishDate = System.DateTime.Now, Text = "Ingefær", Flagged = false }
             );
 
             
