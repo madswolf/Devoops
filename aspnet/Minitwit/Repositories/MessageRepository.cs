@@ -22,6 +22,7 @@ namespace Minitwit.Repositories
         public MessageRepository(MinitwitContext context)
         {
             _context = context;
+            // LOG: Debug: Created MessageRepository
         }
 
         public async Task<List<Message>> GetPrivateTimeline(int id, List<int> follows, int limit = 30)
