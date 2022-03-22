@@ -126,6 +126,7 @@ namespace Minitwit.Repositories
             {
                 _context.Posts.Add(message);
                 await _context.SaveChangesAsync();
+                // LOG: Info: Inserted new message {message}
             }
         }
 

@@ -30,7 +30,6 @@ namespace Minitwit.Controllers
         [Route("/")]
         public async Task<IActionResult> Private_Timeline()
         {
-            // LOG: Debug: Called Private_Timeline()
             var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userStringId == null) return RedirectToAction(nameof(Public_Timeline));
             var userId = int.Parse(userStringId);
@@ -47,7 +46,6 @@ namespace Minitwit.Controllers
         [Route("/public")]
         public async Task<IActionResult> Public_Timeline()
         {
-            // LOG: Debug: Called Public_Timeline()
             var posts = await _messageRepository.GetMessages();
 
             ViewData["Messages"] = posts;
@@ -58,7 +56,6 @@ namespace Minitwit.Controllers
         [Route("[controller]/{username}")]
         public async Task<IActionResult> User_Timeline(string username)
         {
-            // LOG: Debug: Called User_Timeline () {username} (maybe don't use username?)
             var user = await _userRepository.GetUserByUsername(username);
             if (user == null) return NotFound($"UserName with name {username} not found");
 
@@ -82,7 +79,6 @@ namespace Minitwit.Controllers
         [Route("/{username}/Follow")]
         public async Task<IActionResult> Follow(string username)
         {
-            // LOG: Debug: Called Follow() {username} (probably don't use username?)
             var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userStringId == null) return RedirectToAction("login", "Users");
             var userId = int.Parse(userStringId);
@@ -104,7 +100,6 @@ namespace Minitwit.Controllers
         [Route("[Controller]/{username}/unFollow")]
         public async Task<IActionResult> UnFollow(string username)
         {
-            // LOG: Debug: Called UnFollow() {username} (probably don't use username?)
             var userStringId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userStringId == null) return RedirectToAction("login", "Users");
             var userId = int.Parse(userStringId);
@@ -125,7 +120,6 @@ namespace Minitwit.Controllers
         [Route("[controller]/PostMessage")]
         public async Task<IActionResult> PostMessage(MessageCreationDTO message)
         {
-            // LOG: Debug: Called PostMessage() {message}
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return RedirectToAction("login", "Users");
 
@@ -148,7 +142,6 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> FlagMessage([FromBody] FlagMessageDTO flagDTO)
         {
-            // LOG: Debug: Called FlagMessage() {flagDTO}
             if (!ModelState.IsValid) return BadRequest(flagDTO);
             if (!IsRequestFromModerator()) return Unauthorized();
 
@@ -160,7 +153,6 @@ namespace Minitwit.Controllers
 
         private bool IsRequestFromModerator()
         {
-            // LOG: Debug: Called IsRequestFromModerator()
             return Request.Headers["Authorization"].Equals($"Basic {config.Value.ModeratorAPIKey}");
         }
     }
