@@ -32,7 +32,6 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Latest()
         {
-            
             return Ok(new
             {
                 latest = (await _latestRepository.GetLatest()).Value
@@ -45,7 +44,10 @@ namespace Minitwit.Controllers
         public async Task<IActionResult> Register([FromBody] SimulatorUserRegistrationDTO userDTO)
         {
             await UpdateLatestAsync();
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values);
+            }
 
             var user = new User()
             {
