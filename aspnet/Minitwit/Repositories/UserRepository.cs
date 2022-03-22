@@ -26,10 +26,12 @@ namespace Minitwit.Repositories
         public UserRepository(MinitwitContext context)
         {
             _context = context;
+            // LOG: Debug: Created UserRepository
         }
 
         public async Task<User?> GetUserById(int id)
         {
+            // LOG: Debug: Called GetUserById {id}
             using (getUserByIdTime.NewTimer())
             {
                 return await _context.Users
@@ -39,6 +41,7 @@ namespace Minitwit.Repositories
 
         public async Task<User?> GetUserByUsername(string username)
         {
+            // LOG: Debug: Called GetUserByUsername() {username} (don't use username?)
             using (getUserByUsernameTime.NewTimer())
             {
                 return await _context.Users
@@ -48,6 +51,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<User>?> GetUsers()
         {
+            // LOG: Debug: Called GetUsers()
             using (getUsersTime.NewTimer())
             {
                 return await _context.Users.ToListAsync();
@@ -56,6 +60,7 @@ namespace Minitwit.Repositories
 
         public async void InsertUser(User user)
         {
+            // LOG: Debug: Called InsertUser() {user}
             using (insertUserTime.NewTimer())
             {
                 _context.Users.Add(user);
@@ -65,6 +70,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Follow>?> GetUserFollows(int id)
         {
+            // LOG: Debug: Called GetUserFollows() {id}
             using (getUserFollowsTime.NewTimer())
             {
                 return await _context.Users
@@ -77,6 +83,7 @@ namespace Minitwit.Repositories
 
         public async Task<FilteredFollowDTO?> GetFilteredFollows(string username, int limit = 100)
         {
+            // LOG: Debug: Called GetFilteredFollows() {username} {limit} (don't use username?)
             using (getFilteredUserFollowsTime.NewTimer())
             {
                 return await _context.Users
@@ -100,6 +107,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Follow>?> GetUserFollowedBy(int id)
         {
+            // LOG: Debug: Called GetUserFollowedBy() {id}
             using (getUserFollowedByTime.NewTimer())
             {
                 return await _context.Users
@@ -112,6 +120,7 @@ namespace Minitwit.Repositories
         
         public async Task<Follow?> GetFollow(int followerId, int followeeId)
         {
+            // LOG: Debug: Called GetFollow() {followerId} {followeeId}
             using (getFollowTime.NewTimer())
             {
                 return await _context.Follows
@@ -121,6 +130,7 @@ namespace Minitwit.Repositories
 
         public async Task Follow(int followerId, int followeeId)
         {
+            // LOG: Debug: Called Follow() {followerId} {followeeId}
             using (followTime.NewTimer())
             {
                 _context.Follows.Add(new Follow()
@@ -134,6 +144,7 @@ namespace Minitwit.Repositories
 
         public async Task Unfollow(Follow follow)
         {
+            // LOG: Debug: UnFollow() {follow}
             using (unfollowTime.NewTimer())
             {
                 _context.Follows.Remove(follow);
