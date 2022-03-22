@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - master
-      - feature/**
+      - dev
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
