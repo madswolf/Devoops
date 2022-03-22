@@ -1,0 +1,19 @@
+name: "release"
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  release:
+    name: "Release"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "v1.7"
+          prerelease: false
+          title: "Automatic Release"

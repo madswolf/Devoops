@@ -9,12 +9,14 @@
 
 <h2>@ViewData["Title"]</h2>
 <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-    <dt>Username:
-    <dd><input asp-for="username" class="form-control" required autofocus/></dd>
-    <span asp-validation-for="username" class="text-danger"></span>
-    <dt>Password:
-    <dd><input asp-for="pwd" class="form-control" required/></dd>
-    <span asp-validation-for="pwd" class="text-danger"></span>
+    <dl>
+        <dt>Username:
+        <dd><input asp-for="username" class="form-control" required autofocus/></dd>
+        <span asp-validation-for="username" class="text-danger"></span>
+        <dt>Password:
+        <dd><input asp-for="pwd" class="form-control" type="password" required/></dd>
+        <span asp-validation-for="pwd" class="text-danger"></span>
+    </dl>
     <div class="form-group">
         <div class="checkbox">
             <label asp-for="rememberMe">
