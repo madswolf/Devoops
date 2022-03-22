@@ -65,6 +65,7 @@ namespace Minitwit.Repositories
             {
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
+                // LOG: Info: Inserted new user {user}
             }
         }
 
@@ -139,6 +140,7 @@ namespace Minitwit.Repositories
                     FolloweeId = followeeId,
                 });
                 await _context.SaveChangesAsync();
+                // LOG: Info: Added {followerId} as follower of {followeeId}
             }
         }
 
@@ -149,6 +151,7 @@ namespace Minitwit.Repositories
             {
                 _context.Follows.Remove(follow);
                 await _context.SaveChangesAsync();
+                // LOG: Info: Removed {follow.follower} as follower of {follow.followee}
             }
         }
     }
