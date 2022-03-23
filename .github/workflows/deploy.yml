@@ -3,6 +3,8 @@ on:
   push:
     branches: [master]
 
+concurrency: staging_environment
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
