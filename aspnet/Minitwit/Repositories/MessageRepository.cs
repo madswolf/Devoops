@@ -24,16 +24,6 @@ namespace Minitwit.Repositories
             _context = context;
         }
 
-        public async Task<Message> GetMessage(int id)
-        {
-            using (getMessageTime.NewTimer())
-            {
-                return await _context.Posts
-                    .Where(p => p.Id == id)
-                    .FirstOrDefaultAsync();
-            }
-        }
-
         public async Task<List<Message>> GetPrivateTimeline(int id, List<int> follows, int limit = 30)
         {
             using (getPrivateTimelineTime.NewTimer())
@@ -55,16 +45,7 @@ namespace Minitwit.Repositories
         {
             using (getMessagesByAuthorTime.NewTimer())
             {
-                return await _context.Users
-                    .Include(u => u.Messages)
-                    .Where(u => u.Id == id)
-                    .SelectMany(u =>
-                                 u.Messages
-                                .OrderByDescending(p => p.PublishDate)
-                                .Where(p => !p.Flagged)
-                                .Take(limit)
-                    )
-                    .ToListAsync();
+                return await MessagesByAuthorId(id, limit).ToListAsync();
             }
         }
 
@@ -72,22 +53,9 @@ namespace Minitwit.Repositories
         {
             using (getFilteredMessagesByAuthorTime.NewTimer())
             {
-                return await _context.Users
-                    .Include(u => u.Messages)
-                    .Where(u => u.Id == id)
-                    .SelectMany(u =>
-                        u.Messages
-                            .OrderByDescending(p => p.PublishDate)
-                            .Where(p => !p.Flagged)
-                            .Take(limit)
-                    )
-                    .Select(p => new FilteredMessageDTO
-                    {
-                        Content = p.Text,
-                        PublishDate = p.PublishDate,
-                        AuthorName = p.Author.UserName
-                    })
-                    .ToListAsync();
+                var messages = MessagesByAuthorId(id, limit);
+
+                return await FilteredMessageDtos(messages);
             }
         }
 
@@ -108,18 +76,13 @@ namespace Minitwit.Repositories
         {
             using (getFilteredMessagesTime.NewTimer())
             {
-                return await _context.Posts
+                var messages = _context.Posts
                     .Include(p => p.Author)
                     .Where(p => !p.Flagged)
                     .OrderByDescending(p => p.PublishDate)
-                    .Take(limit)
-                    .Select(p => new FilteredMessageDTO
-                    {
-                        Content = p.Text,
-                        PublishDate = p.PublishDate,
-                        AuthorName = p.Author.UserName
-                    })
-                    .ToListAsync();
+                    .Take(limit);
+
+                return await FilteredMessageDtos(messages);
             }
         }
 
@@ -132,13 +95,47 @@ namespace Minitwit.Repositories
             }
         }
 
-        public async Task FlagMessage(int id, bool flagged)
+        public async Task<bool> FlagMessage(int messageId, bool flagged)
         {
             using (flagMessageTime.NewTimer())
             {
-                _context.Posts.Where(p => p.Id == id).FirstOrDefault().Flagged = flagged;
+                Message? message;
+                using (getMessageTime.NewTimer())
+                {
+                     message = await _context.Posts
+                        .FirstOrDefaultAsync(p => p.Id == messageId);
+                }
+                if (message == null) return false;
+
+                message.Flagged = flagged;
                 await _context.SaveChangesAsync();
+                return true;
             }
         }
+
+        private IQueryable<Message> MessagesByAuthorId(int id, int limit)
+        {
+            return _context.Users
+                .Include(u => u.Messages)
+                .Where(u => u.Id == id)
+                .SelectMany(u =>
+                    u.Messages
+                        .OrderByDescending(p => p.PublishDate)
+                        .Where(p => !p.Flagged)
+                        .Take(limit)
+                );
+        }
+
+        private static async Task<List<FilteredMessageDTO>> FilteredMessageDtos(IQueryable<Message> messages)
+        {
+            return await messages.Select(p => new FilteredMessageDTO
+                {
+                    Content = p.Text,
+                    PublishDate = p.PublishDate,
+                    AuthorName = p.Author.UserName
+                })
+                .ToListAsync();
+        }
+
     }
 }
