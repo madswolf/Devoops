@@ -21,7 +21,8 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "iteration": 1647733048598,
+  "id": 1,
+  "iteration": 1648065881425,
   "links": [
     {
       "icon": "info",
@@ -835,7 +836,7 @@
       },
       "id": 35,
       "links": [],
-      "maxDataPoints": 100,
+      "maxDataPoints": 1,
       "options": {
         "colorMode": "none",
         "graphMode": "none",
@@ -859,14 +860,15 @@
           },
           "exemplar": true,
           "expr": "up{}",
-          "format": "time_series",
+          "format": "table",
           "interval": "",
-          "intervalFactor": 2,
+          "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A",
           "step": 3600
         }
       ],
+      "timeFrom": "1s",
       "title": "up? (1 / 0)",
       "type": "stat"
     },
@@ -3148,7 +3150,7 @@
     ]
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-1m",
     "to": "now"
   },
   "timepicker": {
