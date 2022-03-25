@@ -5,12 +5,27 @@ using Minitwit.Models;
 using Minitwit.Models.Context;
 using Minitwit.Models.Entity;
 using Prometheus;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .MinimumLevel.Debug()
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://elastic:ligma1@localhost:9200"))
+    {
+        MinimumLogEventLevel = LogEventLevel.Verbose,
+        AutoRegisterTemplate = true
+    })
+    .CreateLogger();
+builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<MinitwitContext>();
