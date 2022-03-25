@@ -8,20 +8,21 @@ namespace Minitwit.Repositories
     public class LatestRepository : ILatestRepository
     {
         private readonly MinitwitContext _context;
+        private readonly ILogger<LatestRepository> _logger;
 
         private static readonly Gauge getLatestTime = Metrics.CreateGauge("getlatest_time_s", "Time of GetLatest()");
         private static readonly Gauge insertLatestTime = Metrics.CreateGauge("insertlatest_time_s", "Time of InsertLatest()");
 
-        public LatestRepository(MinitwitContext context)
+        public LatestRepository(MinitwitContext context, ILogger<LatestRepository> logger)
         {
             _context = context;
-            // LOG: Debug: Created LatestRepository
+            _logger = logger;
         }
 
         //we can't handle a latest request if none are present... return empty latest
         public async Task<Latest> GetLatest()
         {
-            // LOG: Debug: Called GetLatest()
+            _logger.LogDebug("Called GetLatest()");
             using (getLatestTime.NewTimer())
             {
                 return await _context.Latest
@@ -32,11 +33,11 @@ namespace Minitwit.Repositories
 
         public async Task InsertLatest(Latest latest)
         {
-            // LOG: Debug: Called InsertLatest()
+            _logger.LogDebug("Called InsertLatest()");
             using (insertLatestTime.NewTimer())
             {
                 _context.Latest.Add(latest);
-                // LOG: Debug: Added new latest
+                _logger.LogDebug("Added new latest");
                 await _context.SaveChangesAsync();
             }
         }
