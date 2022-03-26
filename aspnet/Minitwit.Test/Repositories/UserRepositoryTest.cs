@@ -5,7 +5,6 @@ using Minitwit.Models.Entity;
 using Minitwit.Repositories;
 using Minitwit.Test.Context;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
