@@ -54,7 +54,7 @@ namespace Minitwit.Repositories
             }
         }
 
-        public async void InsertUser(User user)
+        public async void InsertUser(User user, int num=1)
         {
             using (insertUserTime.NewTimer())
             {
