@@ -5,6 +5,7 @@ using Minitwit.Models.Entity;
 using Minitwit.Repositories;
 using Minitwit.Test.Context;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Minitwit.Test.Repositories
@@ -26,10 +27,18 @@ namespace Minitwit.Test.Repositories
         }
 
         [Fact]
-        public void DummyTest()
+        public async Task Test_get_latest()
         {
+            var latest = await _repository.GetLatest();
+            Assert.Equal(1101,latest.Value);
+        }
 
-            Assert.Equal(true,true);
+        [Fact]
+        public async Task Test_get_latest_after_insert()
+        {
+            await _repository.InsertLatest(new Latest { Id = 2, Value = 1102, CreationTime = System.DateTime.Now });
+            var latest = await _repository.GetLatest();
+            Assert.Equal(1102, latest.Value);
         }
 
         public void Dispose()
