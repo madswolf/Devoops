@@ -136,7 +136,7 @@ namespace Minitwit.Controllers
             var follower = await _userRepository.GetUserByUsername(username);
             if (follower == null) return NotFound(username);
 
-            var follows = await _userRepository.GetFilteredFollows(username);
+            var follows = await _userRepository.GetFilteredFollows(username, 1);
             
             return Ok(follows);
         }
