@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Scripting.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Minitwit.Repositories;
 using Minitwit.Models;
 using Minitwit.Models.Context;
 using Minitwit.Models.Entity;
 using Prometheus;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
@@ -16,16 +16,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+var elasticUri = new Uri(Environment.GetEnvironmentVariable("ELASTICSEARCH_CONNECTION_STRING") ?? "http://test:test1@localhost:9200");
+Console.WriteLine(elasticUri);
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .MinimumLevel.Debug()
-    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://elastic:ligma1@localhost:9200"))
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
     {
         MinimumLogEventLevel = LogEventLevel.Verbose,
         AutoRegisterTemplate = true
     })
     .CreateLogger();
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+
 
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<MinitwitContext>();
@@ -91,6 +94,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseHttpLogging();
 app.UseStaticFiles();
 
 app.UseRouting();
