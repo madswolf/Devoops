@@ -55,8 +55,12 @@ namespace Minitwit.Controllers
 
             var result = await _userManager.CreateAsync(user, userDTO.pwd);
             
+			try {
             if (result.Errors.FirstOrDefault(e => e.Code == "DuplicateUserName") != null) return StatusCode(400);
             if (!result.Succeeded) return BadRequest(result);
+			}
+			catch (Exception e) {
+			}
             return StatusCode(204);
         }
 
