@@ -11,7 +11,7 @@ namespace Minitwit.Repositories
 
         public Task<List<User>?> GetUsers();
 
-        public void InsertUser(User user);
+        public void InsertUser(User user, int num=1);
 
         public Task<List<Follow>?> GetUserFollows(int id);
 
