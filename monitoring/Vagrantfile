@@ -5,8 +5,8 @@ Vagrant.configure("2") do |config|
   config.vm.box = 'digital_ocean'
   config.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
   config.ssh.private_key_path = "~/.ssh/id_rsa"
-  SSH_KEY_NAME = "jsow"
-  DIGITAL_OCEAN_TOKEN = "55445c1127d020e862f447f15b475033bb4622c68e5eb80c8201dd8eccbc06ed"
+  SSH_KEY_NAME = ENV["GRAFANA_SSH_KEY_NAME"]
+  DIGITAL_OCEAN_TOKEN = ENV["GRAFANA_DIGITAL_OCEAN_TOKEN"]
   config.vm.synced_folder ".", "/vagrant", type: "rsync"
 
   config.vm.define "grafana", primary: false do |server|
