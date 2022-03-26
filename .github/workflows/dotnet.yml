@@ -7,7 +7,7 @@ defaults:
     
 on:
   push:
-    branches: [ 'feature/**' ]
+    branches: [ 'feature/**', dev ]
 
 jobs: 
   build:
