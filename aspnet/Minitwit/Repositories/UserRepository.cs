@@ -25,14 +25,15 @@ namespace Minitwit.Repositories
         private static readonly Gauge unfollowTime = Metrics.CreateGauge("unfollow_time_s", "Time of Unfollow()");
 
 
-        public UserRepository(MinitwitContext context)
+        public UserRepository(MinitwitContext context, ILogger<UserRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<User?> GetUserById(int id)
         {
-            _logger.LogDebug($"Called GetUserById() with arguments {id}");
+            _logger.LogDebug($"Called GetUserById() with arguments id = {id}");
 
             using (getUserByIdTime.NewTimer())
             {
@@ -43,7 +44,7 @@ namespace Minitwit.Repositories
 
         public async Task<User?> GetUserByUsername(string username)
         {
-            _logger.LogDebug($"Called GetUserById() with arguments {username}");
+            _logger.LogDebug($"Called GetUserById() with arguments username = {username}");
 
             using (getUserByUsernameTime.NewTimer())
             {
@@ -64,19 +65,19 @@ namespace Minitwit.Repositories
 
         public async void InsertUser(User user)
         {
-            _logger.LogDebug($"Called InsertUser() {user}");
+            _logger.LogDebug($"Called InsertUser()");
 
             using (insertUserTime.NewTimer())
             {
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"Inserted new user {user}");
+                _logger.LogInformation($"Inserted new user");
             }
         }
 
         public async Task<List<Follow>?> GetUserFollows(int id)
         {
-            _logger.LogDebug($"Called GetUserFollows() {id}");
+            _logger.LogDebug($"Called GetUserFollows() id = {id}");
 
             using (getUserFollowsTime.NewTimer())
             {
@@ -90,7 +91,7 @@ namespace Minitwit.Repositories
 
         public async Task<FilteredFollowDTO?> GetFilteredFollows(string username, int limit = 100)
         {
-            _logger.LogDebug($"Called GetFilteredFollows() {username}, {limit}");
+            _logger.LogDebug($"Called GetFilteredFollows() username = {username}, limit = {limit}");
 
             using (getFilteredUserFollowsTime.NewTimer())
             {
@@ -115,7 +116,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Follow>?> GetUserFollowedBy(int id)
         {
-            _logger.LogDebug($"Called GetUserFollowedBy() {id}");
+            _logger.LogDebug($"Called GetUserFollowedBy() id = {id}");
 
             using (getUserFollowedByTime.NewTimer())
             {
@@ -129,7 +130,7 @@ namespace Minitwit.Repositories
         
         public async Task<Follow?> GetFollow(int followerId, int followeeId)
         {
-            _logger.LogDebug($"Called GetFollow() {followerId}, {followeeId}");
+            _logger.LogDebug($"Called GetFollow() followerId = {followerId}, followeeId = {followeeId}");
 
             using (getFollowTime.NewTimer())
             {
@@ -140,7 +141,7 @@ namespace Minitwit.Repositories
 
         public async Task Follow(int followerId, int followeeId)
         {
-            _logger.LogDebug($"Called Follow() {followerId}, {followeeId}");
+            _logger.LogDebug($"Called Follow() followerId = {followerId}, followeeId = {followeeId}");
 
             using (followTime.NewTimer())
             {
@@ -156,8 +157,7 @@ namespace Minitwit.Repositories
 
         public async Task Unfollow(Follow follow)
         {
-            _logger.LogDebug($"Called UnFollow() {follow}");
-
+            _logger.LogDebug($"Called UnFollow() followerId = {follow.FollowerId}, followeeId = {follow.FolloweeId}");
 
             using (unfollowTime.NewTimer())
             {

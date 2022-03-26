@@ -29,7 +29,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Message>> GetPrivateTimeline(int id, List<int> follows, int limit = 30)
         {
-            _logger.LogDebug($"Called GetPrivateTimeline() with arguments {id}, {follows}, {limit}");
+            _logger.LogDebug($"Called GetPrivateTimeline() with arguments id = {id}, follows = {follows}, limit = {limit}");
             using (getPrivateTimelineTime.NewTimer())
             {
                 return await _context.Posts
@@ -47,7 +47,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Message>> GetMessagesByAuthorId(int id, int limit = 30)
         {
-            _logger.LogDebug($"Called GetMessagesByAuthorId() with arguments {id}, {limit}");
+            _logger.LogDebug($"Called GetMessagesByAuthorId() with arguments id = {id}, limit = {limit}");
             using (getMessagesByAuthorTime.NewTimer())
             {
                 return await _context.Users
@@ -65,7 +65,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<FilteredMessageDTO>> GetFilteredMessagesByAuthorId(int id, int limit = 100)
         {
-            _logger.LogDebug($"Called GetFilteredMessagesByAuthorId() with arguments {id}, {limit}");
+            _logger.LogDebug($"Called GetFilteredMessagesByAuthorId() with arguments id = {id}, limit = {limit}");
 
             using (getFilteredMessagesByAuthorTime.NewTimer())
             {
@@ -90,7 +90,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<Message>> GetMessages(int limit = 30)
         {
-            _logger.LogDebug($"Called GetMessages() with arguments {limit}");
+            _logger.LogDebug($"Called GetMessages() with arguments limit = {limit}");
 
             using (getMessagesTime.NewTimer())
             {
@@ -105,7 +105,7 @@ namespace Minitwit.Repositories
 
         public async Task<List<FilteredMessageDTO>> GetFilteredMessages(int limit = 100)
         {
-            _logger.LogDebug($"Called GetFilteredMessages() with arguments {limit}");
+            _logger.LogDebug($"Called GetFilteredMessages() with arguments limit = {limit}");
 
             using (getFilteredMessagesTime.NewTimer())
             {
@@ -126,18 +126,18 @@ namespace Minitwit.Repositories
 
         public async Task InsertMessage(Message message)
         {
-            _logger.LogDebug($"Called GetFilteredMessages() with arguments {message}");
+            _logger.LogDebug($"Called InsertMessage() with arguments authorId = {message.AuthorId}, text = {message.Text}");
             using (insertMessageTime.NewTimer())
             {
                 _context.Posts.Add(message);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"Inserted new message {message}");
+                _logger.LogInformation($"Inserted new message text = {message.Text}");
             }
         }
 
         public async Task<bool> FlagMessage(int messageId, bool flagged)
         {
-            _logger.LogDebug($"Called FlagMessage() with arguments {messageId}, {flagged}");
+            _logger.LogDebug($"Called FlagMessage() with arguments messageId = {messageId}, flagged = {flagged}");
 
             using (flagMessageTime.NewTimer())
             {
