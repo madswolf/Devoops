@@ -1,0 +1,20 @@
+notifiers:
+  - name: notification-channel-1
+    type: discord
+    uid: notifier1
+    org_name: Main Org.
+    is_default: true
+    send_reminder: true
+    frequency: 1m
+    disable_resolve_message: false
+    # See `Supported Settings` section for settings supported for each
+    # alert notification type.
+    settings:
+      recipient: 'XXX'
+      uploadImage: true
+      token: 'xoxb' # legacy setting since Grafana v7.2 (stored non-encrypted)
+      url: https://discord.com/api/webhooks/956595051822202890/gf3LfbgiL_b3DfdS3pbNRJ4eIBx40d9ZimCVYRFmOebFFCR2l38C1r7pg5AktxrVHXay # legacy setting since Grafana v7.2 (stored non-encrypted)
+    # Secure settings that will be encrypted in the database (supported since Grafana v7.2). See `Supported Settings` section for secure settings supported for each notifier.
+    secure_settings:
+      token: 'xoxb'
+      url: https://discord.com/api/webhooks/956595051822202890/gf3LfbgiL_b3DfdS3pbNRJ4eIBx40d9ZimCVYRFmOebFFCR2l38C1r7pg5AktxrVHXay
