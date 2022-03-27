@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
+using FluentAssertions;
 
 namespace Minitwit.Test.Repositories
 {
@@ -28,21 +29,21 @@ namespace Minitwit.Test.Repositories
         }
 
         [Fact]
-        public async Task Test_get_user_by_id()
+        public async Task GIVEN_UserId_WHEN_GetUserById_THEN_ReturnUser()
         {
             var user = await _repository.GetUserById(1);
             Assert.Equal("user1", user.UserName);
         }
 
         [Fact]
-        public async Task Test_get_user_by_username()
+        public async Task GIVEN_Username_WHEN_GetUserByUsername_THEN_ReturnUser()
         {
             var user = await _repository.GetUserByUsername("user1");
             Assert.Equal(1, user.Id);
         }
 
         [Fact]
-        public async Task Test_insert_user()
+        public async Task GIVEN_UserInfo_WHEN_CreatingUser_THEN_UserIsCreated()
         {
             _repository.InsertUser(new User { Id = 5, UserName = "user5", Email = "user5@test.com" });
             var user = await _repository.GetUserById(5);
@@ -50,44 +51,44 @@ namespace Minitwit.Test.Repositories
         }
 
         [Fact]
-        public async Task Test_get_all_users()
+        public async Task GIVEN_UsersExist_WHEN_GettingAllUsers_THEN_ReturnAllUsers()
         {
             var userlist1 = await _repository.GetUsers();
             _repository.InsertUser(new User { Id = 6, UserName = "user6", Email = "user6@test.com" });
             var userlist2 = await _repository.GetUsers();
-            Assert.True(userlist1.Count < userlist2.Count);
+            userlist1.Count.Should().BeLessThan(userlist2.Count);
         }
 
         [Fact]
-        public async Task Test_get_user_follows()
+        public async Task GIVEN_UserId_WHEN_GettingUserFollows_THEN_ReturnUserFollows()
         {
             var follows = await _repository.GetUserFollows(1);
-            Assert.Equal(3, follows.Count);
+            follows.Count.Should().Be(3);
         }
 
         [Fact]
-        public async Task Test_get_user_filtered_follows()
+        public async Task GIVEN_UserId_WHEN_GettingUserFilteredFollows_THEN_ReturnUserFilteredFollows()
         {
             var follows = await _repository.GetFilteredFollows("user1");
-            Assert.Equal(3, follows.follows.Count());
+            follows.follows.Count().Should().Be(3);
         }
 
         [Fact]
-        public async Task Test_get_user_followed_by()
+        public async Task GIVEN_UserId_WHEN_GettingUserFollowedBy_THEN_ReturnUserFollowedBy()
         {
             var follows = await _repository.GetUserFollowedBy(4);
-            Assert.Equal(2, follows.Count);
+            follows.Count.Should().Be(2);
         }
 
         [Fact]
-        public async Task Test_get_follow()
+        public async Task TGIVEN_FollowerAndFollowee_WHEN_GetFollow_THEN_ReturnMatchingFollow()
         {
             var follow = await _repository.GetFollow(1,2);
             Assert.NotNull(follow);
         }
 
         [Fact]
-        public async Task Test_add_follow()
+        public async Task GIVEN_FollowerAndFollowee_WHEN_CreatingFollow_THEN_FollowIsCreated()
         {
             await _repository.Follow(2, 1);
             var follow = await _repository.GetFollow(2, 1);
@@ -95,7 +96,7 @@ namespace Minitwit.Test.Repositories
         }
 
         [Fact]
-        public async Task Test_unfollow()
+        public async Task GIVEN_FollowerAndFollowee_WHEN_Unfollowing_THEN_FollowIsDeleted()
         {
             await _repository.Follow(4, 1);
             var follow = await _repository.GetFollow(4, 1);

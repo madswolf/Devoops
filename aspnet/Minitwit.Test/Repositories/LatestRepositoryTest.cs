@@ -27,14 +27,14 @@ namespace Minitwit.Test.Repositories
         }
 
         [Fact]
-        public async Task Test_get_latest()
+        public async Task GIVEN_LatestExists_WHEN_GettingLatest_THEN_ReturnLatest()
         {
             var latest = await _repository.GetLatest();
             Assert.Equal(1101,latest.Value);
         }
 
         [Fact]
-        public async Task Test_get_latest_after_insert()
+        public async Task GIVEN_LatestInfo_WHEN_CreatingLatest_THEN_LatestIsCreated()
         {
             await _repository.InsertLatest(new Latest { Id = 2, Value = 1102, CreationTime = System.DateTime.Now });
             var latest = await _repository.GetLatest();
