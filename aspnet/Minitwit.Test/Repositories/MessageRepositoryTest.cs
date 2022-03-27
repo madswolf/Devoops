@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
+using FluentAssertions;
 
 namespace Minitwit.Test.Repositories
 {
@@ -30,48 +31,48 @@ namespace Minitwit.Test.Repositories
         }
 
         [Fact]
-        public async Task Test_get_private_timeline()
+        public async Task GIVEN_UserAndFollows_WHEN_GettingTimeline_THEN_ReturnUserTimeline()
         {
             var follows = (await _userRepository.GetUserFollows(2)).Select(f => f.FolloweeId).ToList();
             var timeline = await _repository.GetPrivateTimeline(2, follows);
-            Assert.Equal(2, timeline.Count);
+            timeline.Count.Should().Be(2);
         }
 
         [Fact]
-        public async Task Test_get_messages_by_author_id()
+        public async Task GIVEN_UserId_WHEN_GettingAuthorMessages_THEN_ReturnUserMessages()
         {
             var messages = await _repository.GetMessagesByAuthorId(3);
-            Assert.Equal(2, messages.Count);
+            messages.Count.Should().Be(2);
         }
 
         [Fact]
-        public async Task Test_get_filtered_messages_by_author_id()
+        public async Task GIVEN_UserId_WHEN_GettingFilteredAuthorMessages_THEN_ReturnFilteredUserMessages()
         {
             var messages = await _repository.GetFilteredMessagesByAuthorId(3);
-            Assert.Equal(2, messages.Count);
+            messages.Count.Should().Be(2);
         }
 
         [Fact]
-        public async Task Test_get_messages()
+        public async Task GIVEN_MessagesExist_WHEN_GettingAllMessages_THEN_ReturnAllMessages()
         {
             var messages = await _repository.GetMessages();
-            Assert.Equal(5, messages.Count);
+            messages.Count.Should().Be(5);
         }
 
         [Fact]
-        public async Task Test_get_filtered_messages()
+        public async Task GIVEN_MessagesExist_WHEN_GettingAllFilteredMessages_THEN_ReturnAllFilteredMessages()
         {
             var messages = await _repository.GetFilteredMessages();
-            Assert.Equal(5, messages.Count);
+            messages.Count.Should().Be(5);
         }
 
         [Fact]
-        public async Task Test_insert_messages()
+        public async Task GIVEN_MessageInfo_WHEN_CreatingMessage_THEN_MessageIsCreated()
         {
             await _repository.InsertMessage(new Message { Id = 7, AuthorId = 1,
                 PublishDate = System.DateTime.Now, Text = "test post", Flagged = false });
             var messages = await _repository.GetMessages();
-            Assert.Equal(6, messages.Count);
+            messages.Count.Should().Be(6);
         }
 
         public void Dispose()
