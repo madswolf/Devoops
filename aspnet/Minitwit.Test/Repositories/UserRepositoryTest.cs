@@ -32,14 +32,14 @@ namespace Minitwit.Test.Repositories
         public async Task GIVEN_UserId_WHEN_GetUserById_THEN_ReturnUser()
         {
             var user = await _repository.GetUserById(1);
-            Assert.Equal("user1", user.UserName);
+            user.UserName.Should().Be("user1");
         }
 
         [Fact]
         public async Task GIVEN_Username_WHEN_GetUserByUsername_THEN_ReturnUser()
         {
             var user = await _repository.GetUserByUsername("user1");
-            Assert.Equal(1, user.Id);
+            user.Id.Should().Be(1);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Minitwit.Test.Repositories
         {
             _repository.InsertUser(new User { Id = 5, UserName = "user5", Email = "user5@test.com" });
             var user = await _repository.GetUserById(5);
-            Assert.Equal("user5", user.UserName);
+            user.UserName.Should().Be("user5");
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace Minitwit.Test.Repositories
         public async Task TGIVEN_FollowerAndFollowee_WHEN_GetFollow_THEN_ReturnMatchingFollow()
         {
             var follow = await _repository.GetFollow(1,2);
-            Assert.NotNull(follow);
+            follow.Should().NotBeNull();
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Minitwit.Test.Repositories
         {
             await _repository.Follow(2, 1);
             var follow = await _repository.GetFollow(2, 1);
-            Assert.NotNull(follow);
+            follow.Should().NotBeNull();
         }
 
         [Fact]
@@ -102,7 +102,7 @@ namespace Minitwit.Test.Repositories
             var follow = await _repository.GetFollow(4, 1);
             await _repository.Unfollow(follow);
             follow = await _repository.GetFollow(4, 1);
-            Assert.Null(follow);
+            follow.Should().BeNull();
         }
 
         public void Dispose()
