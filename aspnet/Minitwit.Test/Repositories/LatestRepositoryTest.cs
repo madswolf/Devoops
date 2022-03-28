@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Minitwit.Models.Context;
 using Minitwit.Models.Entity;
@@ -30,7 +31,7 @@ namespace Minitwit.Test.Repositories
         public async Task GIVEN_LatestExists_WHEN_GettingLatest_THEN_ReturnLatest()
         {
             var latest = await _repository.GetLatest();
-            Assert.Equal(1101,latest.Value);
+            latest.Value.Should().Be(1101);
         }
 
         [Fact]
@@ -38,7 +39,7 @@ namespace Minitwit.Test.Repositories
         {
             await _repository.InsertLatest(new Latest { Id = 2, Value = 1102, CreationTime = System.DateTime.Now });
             var latest = await _repository.GetLatest();
-            Assert.Equal(1102, latest.Value);
+            latest.Value.Should().Be(1102);
         }
 
         public void Dispose()
