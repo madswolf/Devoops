@@ -32,7 +32,7 @@ namespace Minitwit.Repositories
         {
             using (insertLatestTime.NewTimer())
             {
-                _context.Latest.Add(latest);
+                await _context.Latest.AddAsync(latest);
                 await _context.SaveChangesAsync();
             }
         }
