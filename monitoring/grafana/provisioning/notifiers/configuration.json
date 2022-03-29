@@ -1,0 +1,37 @@
+{
+  "template_files": {
+    "Down": "{{ define \"Down\" }}\n  The DevOps server is down, save it!\n{{ end }}"
+  },
+  "alertmanager_config": {
+    "route": {
+      "receiver": "Group Discord",
+      "routes": [
+        {
+          "receiver": "Group Discord"
+        }
+      ]
+    },
+    "templates": [
+      "Down"
+    ],
+    "receivers": [
+      {
+        "name": "Group Discord",
+        "grafana_managed_receiver_configs": [
+          {
+            "uid": "oxE17zynk",
+            "name": "Group Discord",
+            "type": "discord",
+            "disableResolveMessage": false,
+            "settings": {
+              "message": "@everyone SHITTY TWITTER IS DOWN!",
+              "url": "https://discord.com/api/webhooks/956595051822202890/gf3LfbgiL_b3DfdS3pbNRJ4eIBx40d9ZimCVYRFmOebFFCR2l38C1r7pg5AktxrVHXay",
+              "use_discord_username": false
+            },
+            "secureFields": {}
+          }
+        ]
+      }
+    ]
+  }
+}
