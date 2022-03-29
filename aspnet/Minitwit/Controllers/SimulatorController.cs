@@ -92,7 +92,7 @@ namespace Minitwit.Controllers
                 return NotFound($"User with name {username} not found");
             }
 
-            var filteredMessages = await _messageRepository.GetFilteredMessagesByAuthorId(user.Id);
+            var filteredMessages = await _messageRepository.GetFilteredMessagesByAuthorId(user.Id, limit);
 
             return Ok(filteredMessages);
 
@@ -136,7 +136,7 @@ namespace Minitwit.Controllers
             var follower = await _userRepository.GetUserByUsername(username);
             if (follower == null) return NotFound(username);
 
-            var follows = await _userRepository.GetFilteredFollows(username, 1);
+            var follows = await _userRepository.GetFilteredFollows(username, limit);
             
             return Ok(follows);
         }
