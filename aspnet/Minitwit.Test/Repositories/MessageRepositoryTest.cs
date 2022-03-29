@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Minitwit.Test.Repositories
 {
@@ -26,8 +27,8 @@ namespace Minitwit.Test.Repositories
             var builder = new DbContextOptionsBuilder<MinitwitContext>().UseSqlite(_connection);
             _context = new MinitwitTestContext(builder.Options);
             _context.Database.EnsureCreated();
-            _repository = new MessageRepository(_context);
-            _userRepository = new UserRepository(_context);
+            _repository = new MessageRepository(_context, new NullLogger<MessageRepository>());
+            _userRepository = new UserRepository(_context, new NullLogger<UserRepository>());
         }
 
         [Fact]

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Minitwit.Models.Context;
 using Minitwit.Models.Entity;
 using Minitwit.Repositories;
@@ -24,7 +25,7 @@ namespace Minitwit.Test.Repositories
             var builder = new DbContextOptionsBuilder<MinitwitContext>().UseSqlite(_connection);
             _context = new MinitwitTestContext(builder.Options);
             _context.Database.EnsureCreated();
-            _repository = new LatestRepository(_context);
+            _repository = new LatestRepository(_context, new NullLogger<LatestRepository>());
         }
 
         [Fact]
