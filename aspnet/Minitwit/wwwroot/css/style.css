@@ -13,6 +13,7 @@ a {
     }
 
 input[type="text"],
+input[type="email"],
 input[type="password"] {
     background: white;
     border: 1px solid #BFE6E2;
