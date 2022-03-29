@@ -3,6 +3,8 @@ on:
   push:
     branches: [master]
 
+concurrency: staging_environment
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -25,6 +27,7 @@ jobs:
           cd Devoops/aspnet/
           echo making new vm environment file
           echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
+          echo export ELASTICSEARCH_CONNECTION_STRING=\"$ELASTICSEARCH_CONNECTION_STRING\">>env.sh
           echo deploying droplet
           export DROPLET_NAME=$DROPLET_TEMP_NAME
           vagrant up

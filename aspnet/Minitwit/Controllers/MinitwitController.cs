@@ -46,7 +46,6 @@ namespace Minitwit.Controllers
         [Route("/public")]
         public async Task<IActionResult> Public_Timeline()
         {
-
             var posts = await _messageRepository.GetMessages();
 
             ViewData["Messages"] = posts;
@@ -143,7 +142,6 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> FlagMessage([FromBody] FlagMessageDTO flagDTO)
         {
-
             if (!ModelState.IsValid) return BadRequest(flagDTO);
             if (!IsRequestFromModerator()) return Unauthorized();
 
