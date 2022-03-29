@@ -36,8 +36,9 @@ jobs:
           echo ${{ secrets.LOGGING_PASSWORD }} >> test.txt
           echo ${{ secrets.LOGGING_HOST }} >> test.txt
           echo ${{ secrets.LOGGING_PORT }} >> test.txt
+          echo ${{ secrets.ELASTIC_CONNECTION_STRING }} >> test.txt
           echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
-          echo export LOGGINGSEARCH_CONNECTION_STRING=\"http://$LOGGING_USERNAME:$LOGGING_PASSWORD@$LOGGING_HOST:$LOGGING_PORT\">>env.sh
+          echo export ELASTICSEARCH_CONNECTION_STRING=$\"{{ secrets.ELASTIC_CONNECTION_STRING }}\">>env.sh
           echo deploying droplet
           export DROPLET_NAME=$DROPLET_TEMP_NAME
           vagrant up
