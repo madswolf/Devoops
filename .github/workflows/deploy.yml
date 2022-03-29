@@ -11,6 +11,11 @@ jobs:
     steps:
     - name: Deploy shittytwitter app
       uses: appleboy/ssh-action@v0.1.4
+      env:
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        ELASTIC_HOST: ${{ secrets.ELASTIC_HOST }}
+        ELASTIC_PORT: ${{ secrets.ELASTIC_PORT }}
       with:
         host: ${{secrets.SSH_HOST}}
         key: ${{secrets.ACTIONS_SSH_KEY_PRIVATE}}
@@ -27,7 +32,7 @@ jobs:
           cd Devoops/aspnet/
           echo making new vm environment file
           echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
-          echo export ELASTICSEARCH_CONNECTION_STRING=\"$ELASTICSEARCH_CONNECTION_STRING\">>env.sh
+          echo export ELASTICSEARCH_CONNECTION_STRING=\"http://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@$ELASTIC_HOST:ELASTIC_PORT\">>env.sh
           echo deploying droplet
           export DROPLET_NAME=$DROPLET_TEMP_NAME
           vagrant up
