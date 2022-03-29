@@ -36,8 +36,7 @@ namespace Minitwit.Repositories
             _logger.LogDebug("Called InsertLatest()");
             using (insertLatestTime.NewTimer())
             {
-                _context.Latest.Add(latest);
-                _logger.LogDebug("Added new latest");
+                await _context.Latest.AddAsync(latest);
                 await _context.SaveChangesAsync();
             }
         }

@@ -113,7 +113,6 @@ namespace Minitwit.Controllers
                 return NotFound($"User with name {username} not found");
             }
 
-            Console.Write("-------------------------------");
             await _messageRepository.InsertMessage(new Message()
             {
                 Text = messageDTO.content,
@@ -122,7 +121,6 @@ namespace Minitwit.Controllers
             });
 
             return StatusCode(204);
-
         }
 
         [HttpGet]
@@ -151,24 +149,23 @@ namespace Minitwit.Controllers
 
             var follower = await _userRepository.GetUserByUsername(username);
             if (follower == null) return NotFound(username);
-            
+
+            var followeeUsername = followDTO.follow ?? followDTO.unfollow;
+            var followee = await _userRepository.GetUserByUsername(followeeUsername);
+            if (followee == null) return NotFound(followeeUsername);
+
+            var following = await _userRepository.GetFollow(follower.Id, followee.Id);
+
 
             if (followDTO?.follow != null)
             {
-                var followee = await _userRepository.GetUserByUsername(followDTO.follow);
-                if (followee == null) return NotFound(followDTO.follow);
-                var following = (await _userRepository.GetFollow(follower.Id, followee.Id)) is not null;
-                if (following) return StatusCode(204);
+                if (following != null) return StatusCode(204);
 
                 await _userRepository.Follow(follower.Id, followee.Id);
             }
             else if (followDTO?.unfollow != null)
             {
-                var unFollowee = await _userRepository.GetUserByUsername(followDTO.unfollow);
-                if (unFollowee == null) return NotFound(followDTO.unfollow);
-                var following = await _userRepository.GetFollow(follower.Id, unFollowee.Id);
                 if (following == null) return StatusCode(204);
-
 
                 await _userRepository.Unfollow(following);
             }
@@ -197,3 +194,4 @@ namespace Minitwit.Controllers
         }
     }
 }
+    
