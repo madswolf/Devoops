@@ -31,6 +31,11 @@ jobs:
           cp ~/$SSH_KEY_NAME Devoops/aspnet/
           cd Devoops/aspnet/
           echo making new vm environment file
+          echo printenv > test.txt
+          echo ${{ secrets.LOGGING_USERNAME }} >> test.txt
+          echo ${{ secrets.LOGGING_PASSWORD }} >> test.txt
+          echo ${{ secrets.LOGGING_HOST }} >> test.txt
+          echo ${{ secrets.LOGGING_PORT }} >> test.txt
           echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
           echo export LOGGINGSEARCH_CONNECTION_STRING=\"http://$LOGGING_USERNAME:$LOGGING_PASSWORD@$LOGGING_HOST:$LOGGING_PORT\">>env.sh
           echo deploying droplet
