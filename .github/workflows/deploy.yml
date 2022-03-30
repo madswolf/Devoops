@@ -32,7 +32,7 @@ jobs:
           cd Devoops/aspnet/
           echo making new vm environment file
           echo export DATABASE_CONNECTION_STRING=\"$DATABASE_CONNECTION_STRING\">env.sh
-          echo export ELASTICSEARCH_CONNECTION_STRING=${{ secrets.ELASTIC_CONNECTION_STRING }}>>env.sh
+          echo export ELASTICSEARCH_CONNECTION_STRING=\"${{ secrets.ELASTIC_CONNECTION_STRING }}\">>env.sh
           echo deploying droplet
           export DROPLET_NAME=$DROPLET_TEMP_NAME
           vagrant up
