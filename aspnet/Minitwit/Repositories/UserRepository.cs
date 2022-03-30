@@ -10,6 +10,8 @@ namespace Minitwit.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly MinitwitContext _context;
+        private readonly ILogger<UserRepository> _logger;
+
 
         private static readonly Gauge getUserByIdTime = Metrics.CreateGauge("getuserbyid_time_s", "Time of GetUserById()");
         private static readonly Gauge getUserByUsernameTime = Metrics.CreateGauge("getuserbyusername_time_s", "Time of GetUserByUsername()");
@@ -23,13 +25,16 @@ namespace Minitwit.Repositories
         private static readonly Gauge unfollowTime = Metrics.CreateGauge("unfollow_time_s", "Time of Unfollow()");
 
 
-        public UserRepository(MinitwitContext context)
+        public UserRepository(MinitwitContext context, ILogger<UserRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<User?> GetUserById(int id)
         {
+            _logger.LogDebug($"Called GetUserById() with arguments id = {id}");
+
             using (getUserByIdTime.NewTimer())
             {
                 return await _context.Users
@@ -39,6 +44,8 @@ namespace Minitwit.Repositories
 
         public async Task<User?> GetUserByUsername(string username)
         {
+            _logger.LogDebug($"Called GetUserById() with arguments username = {username}");
+
             using (getUserByUsernameTime.NewTimer())
             {
                 return await _context.Users
@@ -48,6 +55,8 @@ namespace Minitwit.Repositories
 
         public async Task<List<User>?> GetUsers()
         {
+            _logger.LogDebug($"Called GetUsers()");
+
             using (getUsersTime.NewTimer())
             {
                 return await _context.Users.ToListAsync();
@@ -56,15 +65,20 @@ namespace Minitwit.Repositories
 
         public async void InsertUser(User user)
         {
+            _logger.LogDebug($"Called InsertUser()");
+
             using (insertUserTime.NewTimer())
             {
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation($"Inserted new user");
             }
         }
 
         public async Task<List<Follow>?> GetUserFollows(int id)
         {
+            _logger.LogDebug($"Called GetUserFollows() id = {id}");
+
             using (getUserFollowsTime.NewTimer())
             {
                 return await _context.Users
@@ -77,6 +91,8 @@ namespace Minitwit.Repositories
 
         public async Task<FilteredFollowDTO?> GetFilteredFollows(string username, int limit = 100)
         {
+            _logger.LogDebug($"Called GetFilteredFollows() username = {username}, limit = {limit}");
+
             using (getFilteredUserFollowsTime.NewTimer())
             {
                 return await _context.Users
@@ -100,6 +116,8 @@ namespace Minitwit.Repositories
 
         public async Task<List<Follow>?> GetUserFollowedBy(int id)
         {
+            _logger.LogDebug($"Called GetUserFollowedBy() id = {id}");
+
             using (getUserFollowedByTime.NewTimer())
             {
                 return await _context.Users
@@ -112,6 +130,8 @@ namespace Minitwit.Repositories
         
         public async Task<Follow?> GetFollow(int followerId, int followeeId)
         {
+            _logger.LogDebug($"Called GetFollow() followerId = {followerId}, followeeId = {followeeId}");
+
             using (getFollowTime.NewTimer())
             {
                 return await _context.Follows
@@ -121,6 +141,8 @@ namespace Minitwit.Repositories
 
         public async Task Follow(int followerId, int followeeId)
         {
+            _logger.LogDebug($"Called Follow() followerId = {followerId}, followeeId = {followeeId}");
+
             using (followTime.NewTimer())
             {
                 _context.Follows.Add(new Follow()
@@ -129,15 +151,19 @@ namespace Minitwit.Repositories
                     FolloweeId = followeeId,
                 });
                 await _context.SaveChangesAsync();
+                _logger.LogInformation($"Added {followerId} as follower of {followeeId}");
             }
         }
 
         public async Task Unfollow(Follow follow)
         {
+            _logger.LogDebug($"Called UnFollow() followerId = {follow.FollowerId}, followeeId = {follow.FolloweeId}");
+
             using (unfollowTime.NewTimer())
             {
                 _context.Follows.Remove(follow);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation($"Removed {follow.Follower} as follower of {follow.Followee}");
             }
         }
     }
