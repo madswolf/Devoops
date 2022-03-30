@@ -7,3 +7,22 @@ datasources:
     is_default: true
     version: 1
     editable: true
+  - name: defaultdb
+    type: postgres
+    access: proxy
+    version: 1
+    editable: true
+    url: "db-postgresql-fra1-40527-do-user-10842035-0.b.db.ondigitalocean.com:25060"
+    database: defaultdb
+    user: doadmin
+    password: "hYj0D9znk3OpXyIi"
+    secureJsonData:
+      password: hYj0D9znk3OpXyIi
+    sslmode: require
+    jsonData:
+      sslmode: require
+      maxOpenConns: 0
+      maxIdleConns: 2  
+      connMaxLifetime: 14400  
+      postgresVersion: 1200
+      timescaledb: false
