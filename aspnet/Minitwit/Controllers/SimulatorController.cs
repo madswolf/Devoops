@@ -32,7 +32,6 @@ namespace Minitwit.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Latest()
         {
-            
             return Ok(new
             {
                 latest = (await _latestRepository.GetLatest()).Value
@@ -45,7 +44,10 @@ namespace Minitwit.Controllers
         public async Task<IActionResult> Register([FromBody] SimulatorUserRegistrationDTO userDTO)
         {
             await UpdateLatestAsync();
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values);
+            }
 
             var user = new User()
             {
@@ -90,7 +92,7 @@ namespace Minitwit.Controllers
                 return NotFound($"User with name {username} not found");
             }
 
-            var filteredMessages = await _messageRepository.GetFilteredMessagesByAuthorId(user.Id);
+            var filteredMessages = await _messageRepository.GetFilteredMessagesByAuthorId(user.Id, limit);
 
             return Ok(filteredMessages);
 
@@ -132,7 +134,7 @@ namespace Minitwit.Controllers
             var follower = await _userRepository.GetUserByUsername(username);
             if (follower == null) return NotFound(username);
 
-            var follows = await _userRepository.GetFilteredFollows(username);
+            var follows = await _userRepository.GetFilteredFollows(username, limit);
             
             return Ok(follows);
         }
