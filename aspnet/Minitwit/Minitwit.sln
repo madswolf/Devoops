@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minitwit", "Minitwit.csproj", "{FD26F7B4-4B7B-4A07-94FC-A661BCB073A8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minitwit.Test", "..\Minitwit.Test\Minitwit.Test.csproj", "{332497BE-BE3F-4B80-BBA0-086723F14C3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{FD26F7B4-4B7B-4A07-94FC-A661BCB073A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD26F7B4-4B7B-4A07-94FC-A661BCB073A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD26F7B4-4B7B-4A07-94FC-A661BCB073A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{332497BE-BE3F-4B80-BBA0-086723F14C3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{332497BE-BE3F-4B80-BBA0-086723F14C3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{332497BE-BE3F-4B80-BBA0-086723F14C3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{332497BE-BE3F-4B80-BBA0-086723F14C3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
