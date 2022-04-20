@@ -5,4 +5,16 @@ services:
       context: .
     ports:
       - "80:80"
-    command: ls
+    network:
+      - minitwit
+    restart: always
+    deploy: 
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 20s
+
+networks:
+  minitwit:
+    driver: overlay
+
