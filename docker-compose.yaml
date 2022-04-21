@@ -1,8 +1,18 @@
 version: "3"
 services:
   aspnet:
-    build:
-      context: .
+    image: wayhowen/devoops:latest
     ports:
-      - "8000:80"
-    command: ls
+      - "80:80"
+    network:
+      - minitwit
+    restart: always
+    deploy: 
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+networks:
+  minitwit:
+    driver: overlay
