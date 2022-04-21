@@ -4,7 +4,7 @@ services:
     image: wayhowen/devoops:latest
     ports:
       - "80:80"
-    network:
+    networks:
       - minitwit
     restart: always
     deploy: 
