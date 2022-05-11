@@ -36,6 +36,7 @@ namespace Minitwit.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(UserRegistrationDTO userDTO)
         {
+            TempData.Remove("ErrorMessage");
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
             var user = new User()
@@ -43,11 +44,18 @@ namespace Minitwit.Controllers
                 UserName = userDTO.username,
                 Email = userDTO.email
             };
+
             if (_context.Users.Any(u => u.UserName == user.UserName))
-                return Conflict($"User with {user.UserName} already exists");
+                TempData["ErrorMessage"] = $"User with {user.UserName} already exists";
+                //return Conflict($"User with {user.UserName} already exists
 
             var result = await _userManager.CreateAsync(user, userDTO.pwd);
-            if (!result.Succeeded) return BadRequest(result);
+            if (!result.Succeeded && !TempData.ContainsKey("ErrorMessage"))
+                TempData["ErrorMessage"] = result.ToString();
+
+            if (TempData.ContainsKey("ErrorMessage"))
+                return RedirectToAction("register", "Users");
+
             await _signInManager.SignInAsync(user, userDTO.rememberMe);
             return RedirectToAction("Private_Timeline","Minitwit");
         }
@@ -67,20 +75,26 @@ namespace Minitwit.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
+            TempData.Remove("ErrorMessage");
             var user = await _userManager.FindByNameAsync(loginDTO.username);
-            if (user == null) return BadRequest("User does not exist");
-            
-            // Hypothetical email-reset if pwd null
-            if (user.PasswordHash == null)
+            if (user == null)
+                TempData["ErrorMessage"] = "User does not exist";
+            else
             {
-                return BadRequest("Password uses old hashing function. (change password with the link sent to your email)");
+                // Hypothetical email-reset if pwd null
+                if (user.PasswordHash == null)
+                    TempData["ErrorMessage"] = "Password uses old hashing function. (change password with the link sent to your email)";
+
+                var result = await _signInManager.PasswordSignInAsync(user, loginDTO.pwd, loginDTO.rememberMe, false);
+                if (!result.Succeeded)
+                    TempData["ErrorMessage"] = "Wrong Username/Password";
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user, loginDTO.pwd, loginDTO.rememberMe, false);
 
-            if (!result.Succeeded) return Unauthorized();
-
-            return RedirectToAction("Private_Timeline", "Minitwit");
+            if (TempData.ContainsKey("ErrorMessage"))
+                return RedirectToAction("login", "Users");
+            else
+                return RedirectToAction("Private_Timeline", "Minitwit");
         }
 
         [HttpGet]
