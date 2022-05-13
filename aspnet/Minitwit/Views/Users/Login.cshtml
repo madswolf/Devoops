@@ -7,6 +7,15 @@
     ViewData["Title"] = "Sign In";
 }
 
+
+@if (TempData.ContainsKey("ErrorMessage"))
+{
+    <div class="error">
+        <h3>@TempData["ErrorMessage"]</h3>
+    </div>
+    TempData.Remove("ErrorMessage");
+}
+
 <h2>@ViewData["Title"]</h2>
 <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
     <dl>
