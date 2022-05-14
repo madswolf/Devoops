@@ -1,8 +1,22 @@
 version: "3"
 services:
   aspnet:
+    image: wayhowen/devoops:latest
     build:
       context: .
     ports:
-      - "8000:80"
-    command: ls
+      - "80:80"
+    environment:
+      - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING}
+    networks:
+      - minitwit
+    restart: always
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 20s
+
+networks:
+  minitwit:
+    driver: overlay
