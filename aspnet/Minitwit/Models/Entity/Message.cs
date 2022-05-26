@@ -11,6 +11,7 @@ namespace Minitwit.Models.Entity
         public int AuthorId { get; set; }
         public User Author { get; set; }
         [Required]
+        [StringLength(255, ErrorMessage = "Message should not exceed 255 characters.")]
         public string Text { get; set; }
         [Required]
         public DateTime PublishDate { get; set; }
