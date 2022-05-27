@@ -1,0 +1,118 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[toc,page]{appendix}
+\usepackage[backend=biber,style=ieee,dashed=false,sorting=ynt]{biblatex}
+\usepackage{tabularx}
+\usepackage{diagbox}
+\addbibresource{sources.bib}
+\usepackage{todonotes}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{titlesec}
+
+\setcounter{secnumdepth}{4}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\title{DevOps 2022 - Group E Final Report}
+\author{jubr@itu.dk, jsow@itu.dk, npal@itu.dk, oeje@itu.dk, osha@itu.dk}
+\date{June 2022}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+\input{introduction}
+
+\section{Process}
+\input{team}
+
+\section{Technologies}
+This section will briefly describe the entire technology stack, and our reasoning for each technology, sometimes comparing them to competitors.
+
+\subsection{Application Framework}
+\input{aspnet}
+
+\subsection{Object-Relational Mapping Framework}
+\input{orm_framework}
+
+\subsection{Database Management System}
+\input{database}
+
+\subsection{Provisioning Tool}
+\input{vagrant}
+
+\subsection{CI/CD Hub} \label{ci_cd_hub}
+\input{github_actions}
+
+
+
+\subsection{Cloud Provider} \label{digitalocean}
+\input{digitalocean}
+
+\subsection{Load Balancing and Scaling} \label{dockerswarm}
+\input{dockerswarm}
+
+\section{Software Maintenance}
+
+\subsection{Continuous Integration and Continuous Deployment}
+\input{ci_and_cd}
+
+\subsection{Monitoring}
+\input{monitoring}
+
+\subsection{Logging}
+\input{logging}
+
+\subsection{Risk Analysis}
+\input{security}
+
+\section{Stack Diagram}
+We have created a diagram to give an overview of our infrastructure and how every service interacts. It shows how the system uses four virtual machines and one managed database to run everything.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{images/technologies.png}
+    \caption{Complete diagram of all services}
+    \label{fig:technology_diagram}
+\end{figure}
+
+\section{Status on Static Analysis}
+\input{staticanalysis}
+
+
+\section{Perspective}
+\input{perspective}
+
+\section{Bibliography}
+\printbibliography[title={Bibliography}]
+
+
+\section{Appendix}
+\subsection{Appendix A - Choice of the main language (C\#)} \label{languagechoice}
+\input{language_choice}
+
+\subsection{Appendix B - SQL Vs NoSQL} \label{sqlvsnosql}
+\input{sqlvsnosql}
+
+\subsection{Appendix C - Scripting languages} \label{scriptinglanguages}
+\input{scripting_languages}
+
+\subsubsection{Shell}
+\input{shell}
+
+\subsubsection{Python}
+\input{python}
+
+\subsection{Appendix D - Security analysis} \label{securityanalysis}
+\input{Security_Appendix}
+
+\end{document}

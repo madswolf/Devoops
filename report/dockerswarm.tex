@@ -1,0 +1,5 @@
+Towards the latter half of the project we began moving towards using Docker Swarm, rather than the singular Digital Ocean droplet.
+
+There were a couple of reasons that made Docker Swarm an attractive approach for orchestrating the services in our system. The tool allowed us to change our deployment strategy from a blue-green strategy to a rolling update strategy instead, allowing the singular instances within the swarm to be updated one at a time, which should allow for faster updating once scaled horizontally. It also has a built in load balancer, allowing for much easier distribution between worker nodes. Because of these functionalities, Docker Swarm provides an approach that is more favorable if the application should be scaled to match a growing number of user requests.
+
+One of the main reasons for why we choose Docker Swarm over other orchestration tools, is the relative ease of use and implementation into our existing setup.

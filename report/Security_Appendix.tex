@@ -1,0 +1,97 @@
+\subsection{Risk Identification}
+\subsubsection{Assets}
+The application consists of multiple services and tools that could all potentially be vulnerable to an attack. These are:
+\begin{itemize}
+    \item Web application and stack
+    \item Digital Ocean droplets
+    \item ELK logging chain
+    \item Metrics service (Grafana)
+    \item GitHub source control (public repository)
+\end{itemize}
+
+\subsubsection{Threat Sources}
+\begin{enumerate}
+    \item Web application and stack
+    \begin{itemize}
+        \item SQL injection
+        \item cross site scripting
+        \item Open ports
+        \item Distributed Denial of Service
+        \item Big messages (DOS)
+    \end{itemize}
+    \item Digital Ocean droplets
+    \begin{itemize}
+        \item Unauthorized access
+    \end{itemize}
+    \item ELK logging chain
+    \begin{itemize}
+        \item Unauthorized access
+    \end{itemize}
+    \item Metrics service (Grafana)
+    \begin{itemize}
+        \item Public metrics gives information about the application status
+        \item Unauthorized access
+    \end{itemize}
+    \item GitHub source control (public repository) 
+    \begin{itemize}
+        \item Unauthorized access
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Risk Scenarios}
+We will now describe the threats and assets in terms of the threats impact on the assets and what security principles they break. 
+To quickly summarize the three CIA security principles:
+\begin{enumerate}
+    \item Confidentiality is the principle of keeping sensitive user data out of the hands of anyone but the user and the application.
+    \item Integrity is the principle of keeping data complete or whole. The data should not be cut, deleted or altered and can therefore be trusted.
+    \item Availability is the principle of keeping the service or data available without interruption or error.
+\end{enumerate}
+\paragraph{Scenarios - Marked with corresponding security principle violation}
+\begin{enumerate}
+    \item [C] Attacker gains information about users due to incorrect request handling.
+    \item [C/I] Attacker performs cross site scripting to mine user data or fool users to submit their data 
+    \item [A] Attacker sends very large message to bottleneck message-handling or fill database.
+    \item [A] Attacker performs cross site scripting to deny users access to the site 
+    \item [C/I/A] Attacker performs SQL injection on web application to download/alter/delete possibly sensitive user data.
+    \item [C/I/A] Attacker finds vulnerability in a dependency listed on the public GitHub repository, potentially allowing full access to an arbitrary part of the system.
+    \item [C/I/A] Attacker gains access to any service through leaked secrets.
+\end{enumerate}
+
+\subsection{Risk analysis}
+\subsubsection{Determine likelihood}
+\begin{enumerate}
+    \item SQL injection, likelihood: very low\\
+    The likelihood of this occurring is fairly small, as we sanitize the data received from users, this however should always be a strong consideration if new features were to be implemented.  
+    \item cross site scripting, likelihood: low \\
+    Same as the likelihood for SQL injections, the most important factor for this is to ensure proper sanitation of user input.
+    \item Open ports, Likelihood: very low\\
+    This problem can be verified fairly easily by performing a scan on the machine to verify whether or not this threat exists. One thing that may be worth consideration is how to approach the issue when a project scales though services exist, such as Shodan, Metasploit, etc., to verify if the issue exists on larger networks. 
+    \item Unauthorized access, likelihood: medium\\
+    From examples early in the course we have seen that it is very important to stay vigilant on access to our services, as these can very easily be a either accessed by malicious actors, or completely shutdown.
+    \item Knowledge of entire stack (Dependencies and versions), likelihood: high\\
+    This one most likely has a high chance of occurring as many web scrapers exist, that try to gain information of services through their repositories. Whether or not this is a problem is up for debate though, as obfuscation alone, is not a strong enough method for ensuring security. The likelihood of bad actors successfully finding useful vulnerabilities is a completely different case which is much less likely.
+    \item Distributed Denial of Service, likelihood: very low \\
+    This could have a pretty big effect on our service, but in terms of likelihood, it isn't very high on the list. A distributed denial of service attack would require a level of resources from the attacker, that automatically excludes many adversaries. Because of this we rank it as very low.
+    \item Big messages (DOS), likelihood: very high\\
+    The likelihood of a bad actor trying to upload big messages is very high, as they are prompted for input, making them curious how big that input can be.
+\end{enumerate}
+
+
+\subsubsection{Determine impact}
+\begin{enumerate}
+    \item SQL injection, impact: critical\\
+    If an SQL injection exploit is found, that gives access to query the database, it could likely give an attacker access to all data, and modifying all data, because of the querying tool having full privileges to the database.
+    \item cross site scripting, impact: high\\
+    Depending on the type of XSS attack, the impact may vary. If scripts are somehow deposited to the database and rendered by users, it has much higher impact than if an attacker gains access to a session cookie or can log user input.
+    \item Open ports, impact: high\\
+    When a systems ports are open an attacker can access any vulnerable services running on those ports.
+    \item Unauthorized access, impact: critical\\
+    An attacker gaining unauthorized access to any of our services will either grant large amounts of information about our data and application, or it will give unlimited access, in form of an API-key, that would let them close the service or take it over.
+    \item Knowledge of entire stack (Dependencies and versions), impact:very low\\
+    While it is likely that someone will inspect the technology stack, it should not be a cause for concern as we use tools, such as Snyk, to check for vulnerabilities in our dependencies, and tools like SonarQube and CodeQL to check for errors and vulnerabilities in our application, either catching errors before they become problems or mitigating their impact by updating to more secure.
+    \item Distributed Denial of Service, impact: medium \\
+    The impact of a DDOS attack is loss of availability, but usually not for extended periods of time. It is rare for these issues to persist longer than weeks or days.  
+    \item Big messages (DOS), impact: medium\\
+    Allowing users to send as large messages as they want will likely lead to bottle-necking some part of the request handling. In the worst case, an attacker can send many messages so large that our database is filled and will require more space which will, in turn, cost the team more money. If we in the future added censorship rules to messages, the application would also have to parse the content of these huge requests, taking many CPU-resources of our backend.
+    
+\end{enumerate}

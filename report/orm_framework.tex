@@ -1,0 +1,8 @@
+To manage data between application and database, we use the Object-relational mapping library Entity Framework. This particular framework was chosen partly because we were familiar with it, but also because of the following points: \\
+
+\noindent Entity Framework provides a lot of useful tools and features for web applications, such as: 
+\begin{description}
+\item [lazy loading] which improves performance, postponing the execution of a query until it is actually needed
+\item [query translation/inspection] which allows for checking how the actual queries performed on the database look like, and enables us to tweak them to improve the performance
+\item [changes tracking] which makes deploying the database schema changes easier, since it takes a single command to generate a migration based on the current state and a new database schema definition, and seldom have to make decisions on how something should be migrated.
+\end{description}

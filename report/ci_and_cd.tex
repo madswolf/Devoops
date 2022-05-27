@@ -1,0 +1,36 @@
+During the project, we set up a pipeline for continuous integration and deployment. The pipeline begins with someone creating a pull-request to the dev branch from a feature branch. The code from the feature branch is automatically built and tested with \texttt{dotnet test} when pushed, so we know it works and is ready to be merged. Once the pull request is reviewed and merged, the dev branch can be merged into master, which starts our deployment pipeline. The pipeline works in the following steps:
+\begin{enumerate}
+    \item SSH into the deployer-machine.
+    \item Load environment variables into the deployer (tokens, ssh keys, connection strings, etc.).
+    \item Clone repository onto deployer.
+    \item Create environment for the web server.
+    \item Run \texttt{vagrant up} on deployer to provision the web server VM.
+    \item Run scripts to replace old production server with the new one, if the new deployment was successful.
+\end{enumerate}
+
+\subsubsection{SSH into the deployer}
+The deployer is a machine hosted separately from GitHub for two reasons. It decreases our dependence on GitHub, letting us deploy even if GitHub is down. It also gives more freedom to configure our deployer-machine, since GitHub Actions does not have an out-of-the-box image with Vagrant on Linux, which we would then have to configure ourselves anyways.
+
+\subsubsection{Load environment variables}
+Since we do not want to store secrets in our public repository, we use GitHub Actions to store our secrets, and load them into environment variables during deployment. This also lets us switch the target machine-name that Vagrant uses by exporting a new environment variable, which simplifies swapping between the old production server and the new temp server.
+
+\subsubsection{Clone repository onto deployer-machine}
+The deployer clones the repo such that it can transfer the application to the web server. 
+
+
+\subsubsection{Create environment for web server}
+The database and logging connection strings are loaded as environment variables. The deployer creates a script \texttt{env.sh}, which loads the connection string into the environment of the web server. The script is then used as part of the Vagrant provisioning.
+
+\subsubsection{Run \texttt{vagrant up} on deployer}
+The web server is provisioned and the program is started on port 80.
+
+\subsubsection{Run scripts to replace the old production server}
+Now that the server should be running, we need to make sure that it is actually alive, after which we can replace the old production server through a blue-green strategy. We have three scripts that run after each other:
+\begin{enumerate}
+    \item \texttt{MinitwitAlive.py} repeatedly sends a request for the front page to the newly opened web server. If it responds with status code \texttt{200}, we assume that the server works.
+    \item \texttt{reassign\_floating\_ip.py} moves a static IP from the old production server to the newly provisioned server. If this script succeeds, the old production server is shut down, having seamlessly replaced the production server without downtime.
+    \item \texttt{rename\_droplet.py} renames the new server from \textit{temp} to \textit{prod}.
+\end{enumerate}
+
+\subsubsection{New version is deployed}
+When all these steps have completed without errors, we have successfully deployed the newest version of the application. If any of these steps fail, the new deployment is rolled back with a failure on the GitHub Actions page.
