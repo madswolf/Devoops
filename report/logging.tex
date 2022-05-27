@@ -1,0 +1,17 @@
+\subsubsection{Setup}
+Our logging setup consists of 4 components:
+\begin{itemize}
+    \item Serilog - utility for Asp.NET for logging the events, with a target set as an Elasticsearch instance
+    \item Elasticsearch - for searching and aggregating the logs
+    \item Kibana - for visualizing the logs 
+    \item Nginx - reverse proxy for restricting access to other components
+\end{itemize}
+Much like in the monitoring case, the whole stack was dockerized, and a Vagrant file was created for deployment purposes. The machine used for serving the logs had to be a bit bigger in terms of RAM (4gb), otherwise Elasticsearch and Kibana would not work.
+It occurred to us later in the project, that the server's 80GB disk filled up rather quickly, as we had not set a "time to live" on the logs. Ideally, this would be set to two weeks or so. In the end, this meant that we were not able to index the logs, due to lack of space.
+
+\subsubsection{Idea}
+We wanted to have the ability to inspect queries that were being made to the database. This, with the addition of out-of-the-box logging allowed us to have a full overview of what the application was doing.
+
+\subsubsection{Result}
+As part of project we introduced an intentional bug somewhere in the application, and had another part of the group attempt to identify it with only the logs we collect.
+The results of this bug-hunt can be seen in \cite{bugs}.
