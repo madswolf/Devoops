@@ -1,0 +1,17 @@
+The static analysis tools we have used are SonarQube (through SonarCloud), Code Climate, Better Code Hub, Snyk, CodeQL and ActionLint. Badges showing the status of all the run tools can be viewed at the top of the \texttt{readme.md} file in the GitHub repository \cite{repository}.
+\begin{description}
+\item [Sonar Cloud:] The output of our latest run on Sonar Cloud can be seen here in \cite{sonarcloud}, and shows that we get a score of 'A' on every mark. We have some code smells which relate to null references in the code when we fetch from the database.
+\item [Code Climate:] Code Climate gives us a good maintainability score, with an 'A' in technical debt. It can be found in \cite{codeclimate}
+\item [Better Code Hub:] We could not get better code hub to exclude parts of our repository (like the old python version of MiniTwit), which results in it giving us a lower score, with many errors. Because of this, we have put less emphasis on the results from Better Code Hub, in comparison to the other tools.
+\item [Snyk:] Snyk was used to analyse packages and their vulnerabilities. As of writing this report, there are no found vulnerabilities in the MiniTwit project, but throughout the project we used snyk to fix vulnerabilities in a dependency called "Gravatar Helper" and outdated system packages.
+\item [CodeQL:] CodeQL notified us of hard coded user credentials which were for testing, and some false positive security flaws, due to how the system is built. 
+\item [ActionLint:] We used ActionLint to verify that our scripts on GitHub Actions were not malformed, and thus would not run. As of writing this report they are all correctly formed.
+\end{description}
+
+\subsection{Code coverage}
+Using \texttt{dotnet test} to capture code coverage in our application. At first glance we get a \textit{fairly bad} score of 13\%. This is because it includes a bunch of automatically generated files, such as database migrations, as well as our frontend cshtml, which we agreed not to test. When we narrow our coverage to just the controllers, as well as what we call "Repository files" (files that access the entities, such that the controllers do not access the database directly), we improve to 47.6\%. While it is still a relatively low score, we do not test our controllers since they only call the "Repository" files, which are fully tested. Because of this, we believe we have acceptable code coverage, while we could still add tests in controllers.
+
+
+\subsection{License}
+
+We have run the ScanCode toolkit to check the licenses of the application, and everything uses the MIT license, apart from the Open Iconic font, which has its own license added in the repository. By the results of this \cite{scancode}, we have decided to use the MIT license for the application.

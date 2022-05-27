@@ -1,0 +1,4 @@
+Since we are only storing data about users and their tweets, a standard DBMS like PostgreSQL, MySQL or MS SQL Server is sufficient, with none having a major benefit over another. We ended up going with Postgres, because of our cloud provider and our familiarity with PSQL. During our consideration we compared the scalability of various solutions - even NoSQL options with their horizontal scaling - but we did not foresee that Postgres would cause us any issues.
+
+\subsubsection{Hosting on Digital Ocean}
+Our choice of DBMS has also been heavily affected by the fact that Digital Ocean (our chosen cloud provider) offers hosting a managed database, which automatically logs all database transactions and backs up our data independently of our application. While hosting the database and application separately increases response time per query, it simplifies difficult problems with data-migration during redeployment.

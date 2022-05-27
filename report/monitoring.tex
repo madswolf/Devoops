@@ -1,0 +1,29 @@
+\subsubsection{Stack}
+To monitor the application, we used a basic Prometheus-Grafana setup consisting of:
+\begin{itemize}
+    \item Calls to Prometheus metrics library within source code 
+    \item Prometheus instance that aggregates the metrics
+    \item Grafana instance for displaying the data
+\end{itemize}
+
+\subsubsection{Provisioning}
+Both Grafana and Prometheus are provisioned using configurations stored inside the "monitoring" folder in our repository.
+
+Furthermore, we have dockerized both setups and created a Vagrant file, allowing us to start the monitoring service with a single command.
+\paragraph{Problems}
+While provisioning of the Prometheus instance worked flawlessly, we encountered some issues with Grafana. Namely, the provisioning files for database as a data source were not working correctly, so we had to insert some details manually each time.
+
+It was also very difficult to provision an automatic alert/notification system, so we decided to do that manually, since provisioning of this server happens infrequently.
+
+\subsubsection{Visualization}
+\paragraph{Idea}
+Grafana was used to help visualize metrics, to gain insight into the usage of the application.
+
+Since everything in our app heavily relies on database queries, we decided to time each of them to see how fast they are. 
+
+To understand the average user better and to see how much data we actually have, we added database queries as another data source.
+
+Finally, in order to see how well the system performs, and how many resources it uses, we added some metrics that display those parameters. In case the system went down, Grafana would alert us through a specified channel on Discord.
+
+\paragraph{Results}
+Thanks to the visualization, we managed to fix some issues regarding database queries. We could also see usage patterns and act accordingly in case we would need to. At one point in the project, we also got a notification from the outage-alerter during development, which we quickly fixed.
