@@ -1,4 +1,7 @@
 version: "3"
+networks:
+  minitwit:
+
 services:
   aspnet:
     image: wayhowen/devoops:latest
@@ -11,6 +14,7 @@ services:
     restart: always
     environment:
       - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING}
+      - ELASTICSEARCH_CONNECTION_STRING=${ELASTICSEARCH_CONNECTION_STRING}
     deploy: 
       replicas: 3
       update_config:
