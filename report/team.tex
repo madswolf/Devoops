@@ -1,0 +1,16 @@
+\subsection{Team work}
+When the project first started, we quickly decided on a set of rules to help us throughout the project. Such rules were for example: we would always create new branches for features, never push directly to the master branch on GitHub, and use Discord for both communication, as well as a place to share app secrets between group members. To discourage rule breaking, if someone were to break a rule, they would owe beers or something similar for a final celebration once the project was over.
+
+The team would always meet up on campus on Tuesdays, which was the designated work day for the DevOps course. Here we would discuss the previous weeks work, what everyone was working on currently, and what people planned on doing until next week. We often ate lunch together on this day as well, and sometimes played ping pong after class to help us get to know each other, and to help us wind down after a day of work.
+
+\subsection{Version Control}
+Git was picked as the version control system for this project, and was used through GitHub. Everyone in the group was familiar with Git and GitHub already, so we could get quickly started with the project. By using GitHub, we were also able to use GitHub Actions in our workflow, which will be explained in further detail in section \ref{ci_cd_hub}.
+
+\subsection{Work practices}
+The team has mainly been working in smaller groups of 1-2 people on each task throughout the project. As the group consisted of 5 people in total, it did not make sense to involve the entire group in each task, as it would simply not be efficient use of development time.
+
+\subsubsection{Work division}
+To keep track of tasks to be done, we used GitHub Projects, which is a Kanban board directly attached to GitHub. It allowed us to quickly create tasks from GitHub Issues, as well as assign developers and branches to said tasks. This was under-utilized throughout the project, but was picked up again near the hand-in date, where it proved to be very helpful to create a final to-do list. Outside of the Kanban board, we also reminded each other of tasks to be done through other communication channels, such as Discord or in person.
+
+\subsubsection{Branch strategy}
+When a new task was being worked on, people involved were to create a new branch on the GitHub repository, with a fitting name of the feature, which was to be merged into a central development branch at a later point. Once the task was done, at least one person outside of the task had to review the pull request. Afterwards, the new feature was discussed in the group, either online or in person, ensuring everyone was caught up to speed. When the central development branch had had a reasonable amount of changes, it would be merged into the master branch, and then deployed automatically.

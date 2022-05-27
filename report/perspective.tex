@@ -1,0 +1,30 @@
+\subsection{Structuring of infrastructure}
+We decided early that separating major parts of our infrastructure into separate machines/images/etc. would be a good way to structure the project. As the project progressed, we came to appreciate this separation, as it made each piece easier to manage and easy to swap out.
+
+A concrete example would be our separation of the main application and the database. This separation made deployment easier than trying to move the data from one VM to another without losing it.
+
+\subsection{Concurrent deployment caused outage}
+We used GitHub Actions to deploy our application, unaware of the fact that GitHub Actions defaults to running actions concurrently, instead of queuing them if multiple are triggered. This caused one of our deployment-scripts to fail in such a way that both the new and old production VMs were shut down simultaneously, leaving us without a production server. This was caused by us merging multiple feature branches into the main branch at the same time, and was before we had set up alerts, so the outage lasted for about 30 minutes before we realized the site had gone offline.
+
+The learning experience we acquired from this issue, is that we have to think of our infrastructure just like our code, with critical sections and all the other considerations that comes with concurrent access to shared resources.\\
+
+We fixed the issue by introducing a flag to make that specific action queue its runs, instead of doing them concurrently:\\
+\href{https://github.com/ChadIImus/Devoops/commit/d84b7f3386f1c9106bc173767507488977856268}{Fix on github.com}
+
+
+\subsection{Handling secrets}
+
+During the project work, we had one case of secrets being leaked:
+\href{https://github.com/ChadIImus/Devoops/commit/8f034df248d53f19b084fa88ce6c546c87714843}{Fixed leak}
+
+Secrets were kept on the deployer VM, which used them to deploy the application, and the rest were kept on separate platforms such as Discord and GitHub Actions Secrets. This kept it out of anyone else's hands, but ideally we would have set up some machine/key-vault that kept all secrets stored in one place and when needed we fetch them programmatically with individual secrets for each developer. There are two reasons for this. The separate platforms required developers to manually fetch zip files with keys, or copy paste keys individually, so the process was not very streamlined. Security was also at risk, since the secrets were shared over Discord, which meant that Discord kept logs of our messages.
+
+\subsection{Quality of tools}
+We learned that investing time in finding the best tool or workflow is just as important as working with said tool. Our experience with GitHub Actions and Vagrant showcases this well. When we started using GitHub Actions, we found some working examples and went from there. At some point, we encountered an error, and were then left to keep pushing changes to the action to see if the problem was fixed. 
+
+We later discovered that there are tools for running actions locally, which allow for faster iteration time, and much better debugging. \\
+
+\noindent Our experience with Vagrant as a provisioning tool was also not the best. It is quite slow - even when we did not use it with GitHub Actions. 
+
+We found it very difficult to use SSH keys with Vagrant. Vagrant kept trying to use local keychains or would load the SSH keys in with wrong formatting, and it kept breaking when running the vagrantfile on different members' computers. When we later used Digital Ocean's API and Docker for creating dockerized hosts, we discovered that it was much faster and gave us more freedom to choose how we wanted to interact with the VMs, after they were provisioned. The reduced iteration time would have made configuring our supporting infrastructure more productive, as each attempt with Docker would be several minutes quicker than Vagrant. 
+

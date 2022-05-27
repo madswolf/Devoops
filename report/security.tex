@@ -1,0 +1,36 @@
+\subsubsection{Risk Matrix}
+In this section we present the results of our internal security audit, for a more in-depth description of the items in the matrix please see appendix \ref{securityanalysis}.
+
+\noindent Below is a table showcasing the likelihood of identified risks and their impact if they were to be exploited.
+
+\begin{tabularx}{1\textwidth} { 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X 
+  | >{\raggedright\arraybackslash}X | }
+ \hline
+ \diagbox[width=1\textwidth/8+2\tabcolsep\relax, height=1.3cm]{Likelihood }{Impact} & very low & low & medium & high & critical \\
+ \hline
+ very low & & & DDOS & Open ports & SQL injection \\[8ex]
+ \hline
+ low & & & & XSS &\\[8ex]
+ \hline
+ medium & & & & & Unauthor-ized access \\[8ex]
+ \hline
+ high & Knowledge of stack & & & &\\[8ex]
+ \hline
+ very high & & & Big messages & &\\[8ex]
+\hline
+\end{tabularx}
+
+
+\subsubsection{Solutions/mitigations}
+Based on the risk analysis and the problems we found, we came up with solutions to mitigate some of the issues.
+\begin{description}
+    \item [Big messages.] Sending long messages to saturate the network connection can be mitigated heavily by imposing character limits on the length of messages. \textbf{This was implemented by the team.}
+    \item [Open ports.] There is a multitude of port scanning tools available that would allow the team to ensure no port is left open. \textbf{This was implemented by the team.}
+    \item [Unauthorized access.] The likelihood of leaking secrets is reduced by us enforcing required reviews on pull requests to the repository, making uploading keys less likely. Likewise the developers should ensure that no authentication information is shared through insecure methods. \textbf{This was exercised by the team.}
+    \item [DDOS.] There are a few defense measures one can employ to reduce the impact of DDOS attacks, such as rate limiting, detecting bot patterns and blacklisting bad actors. Some of these measures are hard to build, and is therefore usually outsourced to companies like CloudFlare.
+\end{description}
