@@ -1,18 +1,26 @@
-# running locally
-```cmd
-cd Minitwit
-dotnet run
-```
-This will use a local in-memory database and logging
-To use another postgres db set DATABASE_CONNECTION_STRING
-To use another logging url set ELASTICSEARCH_CONNECTION_STRING
+### Prerequisites
 
-# provision
-Set SSH_KEY_NAME, DIGITAL_OCEAN_TOKEN and DROPLET_NAME to appropriat values
-prepare/download deployer environment script named "env.sh" with the fields
-DATABASE_CONNECTION_STRING and ELASTICSEARCH_CONNECTION_STRING
+1. Docker
+2. A PSQL database
+3. An ELK stack
+4. (deploy) python
 
-Then run
-```cmd
-vagrant up
-```
+
+### Running (locally)
+
+1. Open shell in git root folder
+2. Set environment variables:
+    * DATABASE_CONNECTION_STRING
+    * ELASTICSEARCH_CONNECTION_STRING (host + basic authentication)
+3. set replicas in the docker-compose file to 1
+4. Run ```docker compose up```
+
+### Deploying
+
+1. Open shell in git root folder
+2. Set environment variables:
+    * SSH_KEY_FOOTPRINT
+    * DIGITAL_API_TOKEN
+    * DATABASE_CONNECTION_STRING
+    * ELASTICSEARCH_CONNECTION_STRING (host + basic authentication)
+3. Run ```python scripts/deployscripts/deploy_docker_swarm.py```
